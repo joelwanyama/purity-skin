@@ -1,0 +1,44 @@
+name: Quality gate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Use Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Unit tests
+        run: npm run test
+      - name: Embedded PostgreSQL authorization and transaction tests
+        run: npm run test:db
+      - name: Dependency audit
+        run: npm audit --audit-level=low
+      - name: Production build
+        run: npm run build
+      - name: Install Chromium for browser gate
+        run: npx playwright install --with-deps chromium
+      - name: Playwright UI and accessibility gate
+        run: npm run test:e2e
