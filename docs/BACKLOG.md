@@ -10,7 +10,7 @@ Status legend: **done** · **ready** (no blockers) · **needs owner** (blocked o
 
 | # | Item | Evidence |
 | --- | --- | --- |
-| 1 | Per-product share pages with real previews | `scripts/lib/prerender.mjs` + 10 unit tests; `check-build` fails when a published product has no page; live smoke test requests each page from `/prerender.json`. See `docs/SHARE-PAGES.md` |
+| 1 | Per-product share pages with real previews | `scripts/lib/prerender.mjs` + 10 unit tests; `check-build` fails when a published product has no page; the live smoke test requests each page from `/prerender.json` and asserts `/shop` is served with no redirect. See `docs/SHARE-PAGES.md` |
 | 2 | Photo pipeline: 480 px card, 1200 × 630 share crop, `srcset`/`sizes`, measured `width`/`height`, lazy | `scripts/build-photo-variants.mjs`, `src/catalog/photo-variants.json`, `ProductPhoto.tsx`; measured 296 kB → 41 kB per card. See `docs/PHOTO-PIPELINE.md` |
 | 3 | 1080 × 1080 Status price cards | `npm run export:cards` → `public/downloads/cards/<slug>.jpg` (157 kB measured on a 1080 × 1080 card with a photo, budget 300 kB), only for published products with a confirmed price |
 | 4 | UNBS / PDPO pack record, owner-first | `src/lib/compliance.ts` + 17 unit tests, `ComplianceNotes`/`ComplianceEditor`, builder section + notes panel, `/policies#pack-record` |
@@ -30,6 +30,7 @@ Everything below was checked in a real browser against `https://purityskin.pages
 | `/shop/<draft>` | 3 confirmed pack rows shown, unconfirmed batch code hidden |
 | `/policies#pack-record` | section present; counting paragraph reads "This shop does not run analytics…"; **0** analytics scripts in the page |
 | `/downloads/purity-skin-owner-guide.pdf` | HTTP 200, `application/pdf`, real `%PDF-` header, 526 kB; HTML copy 715 kB; builder 121 kB |
+| `/shop` redirect | Found live: Cloudflare Pages 308-redirected `/shop` → `/shop/` because the page was a directory index. Fixed by emitting `shop.html` and `shop/<slug>.html`; a smoke check now fails if it regresses |
 | CI | `Cloudflare Pages` and `verify` (lint, typecheck, 106 unit tests, embedded-Postgres tests, build, committed-dist check, Playwright + axe) both green |
 
 ### Known limitation of this environment

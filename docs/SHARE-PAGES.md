@@ -8,8 +8,8 @@ When a customer shares a PURITY SKIN link in a WhatsApp group, Facebook or X, th
 
 | File | Contents |
 | --- | --- |
-| `shop/index.html` | the shop, with its own title, canonical URL and `ItemList` |
-| `shop/<slug>/index.html` | one per **published** product |
+| `shop.html` | the shop, with its own title, canonical URL and `ItemList` |
+| `shop/<slug>.html` | one per **published** product |
 | `prerender.json` | what was written, so the build check and the live smoke test agree with the build |
 | entries in `sitemap.xml` | one `<loc>` per product page, `priority 0.8` |
 
@@ -23,6 +23,12 @@ Each product page is the built `index.html` with its head rewritten and a readab
 
 Real visitors still get the app: the page keeps `<div id="root">` and the hashed bundle, so React renders the same product from the same catalogue.
 
+## Why `.html` files and not directories
+
+Cloudflare Pages serves `dist/shop/index.html` at `/shop/` and answers `/shop` with a **308** redirect to `/shop/`. A canonical link that points at a redirect is a canonical link wasted, and the same would have applied to every product URL shared in WhatsApp.
+
+So the prerenderer writes `dist/shop.html` and `dist/shop/<slug>.html`. Pages resolves the clean URL `/shop/<slug>` straight to the file: HTTP 200, no redirect, and the canonical, `og:url` and sitemap entry all match the URL a customer actually shares. `scripts/smoke-deployed.mjs` asserts this on the live site — it fails if `/shop` is not served directly.
+
 ## Rules that keep it honest
 
 - **Only published products.** Drafts, archived products, products without a name or slug never get a page. `publishableProducts()` is the single gate.
@@ -34,7 +40,7 @@ Real visitors still get the app: the page keeps `<div id="root">` and the hashed
 ## Verified
 
 - `scripts/lib/prerender.test.mjs` — 10 tests against a throwaway build directory using the real page template: per-product titles and canonicals, price in the description, `Product` present only with a confirmed price, drafts and unnamed products excluded, share crop preferred, brand fallback when a photo is missing, `ItemList` on the shop index, sitemap and manifest contents, honest empty shop, HTML/JSON escaping, and the `<noscript>` summary.
-- `scripts/check-build.mjs` — fails the build if a published product has no `shop/<slug>/index.html`, if its canonical or `og:title` is missing, if it carries neither structured data nor the "price confirmed" wording, or if a page exists for a product that is not published.
+- `scripts/check-build.mjs` — fails the build if a published product has no `shop/<slug>.html`, if its canonical or `og:title` is missing, if it carries neither structured data nor the "price confirmed" wording, or if a page exists for a product that is not published.
 - `scripts/smoke-deployed.mjs` — on the live URL, reads `/prerender.json` and requests every listed page, checking status, HTML type, its own metadata, that the app shell is still there for real visitors, and that any published Status card is a real PNG.
 
 ## Changing the domain

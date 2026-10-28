@@ -109,8 +109,8 @@ const published = (catalogue.products ?? []).filter(
   (product) => product && product.status === 'published' && String(product.slug ?? '').trim() && String(product.name ?? '').trim(),
 )
 
-if (!(await exists('shop/index.html'))) {
-  fail('Missing prerendered shop page: shop/index.html. Run `npm run build` (it runs scripts/prerender.mjs).')
+if (!(await exists('shop.html'))) {
+  fail('Missing prerendered shop page: shop.html. Run `npm run build` (it runs scripts/prerender.mjs).')
 }
 
 let prerendered = { products: [] }
@@ -122,17 +122,17 @@ try {
 
 for (const product of published) {
   const slug = String(product.slug).trim()
-  const page = await read(`shop/${slug}/index.html`, { required: false })
+  const page = await read(`shop/${slug}.html`, { required: false })
   if (!page) {
-    fail(`Published product "${slug}" has no static page at shop/${slug}/index.html; its link preview would be blank.`)
+    fail(`Published product "${slug}" has no static page at shop/${slug}.html; its link preview would be blank.`)
     continue
   }
   if (!page.includes(`<link rel="canonical" href="`) || !page.includes(`/shop/${slug}"`)) {
-    fail(`shop/${slug}/index.html does not declare its own canonical URL.`)
+    fail(`shop/${slug}.html does not declare its own canonical URL.`)
   }
-  if (!page.includes(`property="og:title"`)) fail(`shop/${slug}/index.html has no og:title.`)
+  if (!page.includes(`property="og:title"`)) fail(`shop/${slug}.html has no og:title.`)
   if (!(page.includes('application/ld+json') || page.includes('Price confirmed on WhatsApp'))) {
-    fail(`shop/${slug}/index.html carries neither structured data nor the "price confirmed" wording.`)
+    fail(`shop/${slug}.html carries neither structured data nor the "price confirmed" wording.`)
   }
   if (!(prerendered.products ?? []).includes(slug)) {
     fail(`prerender.json does not list "${slug}", so the smoke test cannot check it.`)
@@ -141,7 +141,7 @@ for (const product of published) {
 
 for (const slug of prerendered.products ?? []) {
   if (!published.some((product) => String(product.slug).trim() === slug)) {
-    fail(`shop/${slug}/index.html was prerendered for a product that is not published. Delete the stale page and rebuild.`)
+    fail(`shop/${slug}.html was prerendered for a product that is not published. Delete the stale page and rebuild.`)
   }
 }
 

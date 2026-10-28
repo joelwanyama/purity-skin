@@ -78,14 +78,14 @@ describe('prerendering per-product share pages', () => {
     expect(manifest.products).toEqual(['test-serum', 'test-bar'])
     expect(manifest.pages).toBe(3)
 
-    const serum = read(root, 'shop/test-serum/index.html')
+    const serum = read(root, 'shop/test-serum.html')
     expect(serum).toContain('<title>Sample Serum (test only) 30 ml · PURITY SKIN</title>')
     expect(serum).toContain(`<link rel="canonical" href="${ORIGIN}/shop/test-serum" />`)
     expect(serum).toContain(`<meta property="og:url" content="${ORIGIN}/shop/test-serum" />`)
     expect(serum).toContain('UGX 48,000')
     expect(serum).toContain('<meta property="og:type" content="product" />')
 
-    const bar = read(root, 'shop/test-bar/index.html')
+    const bar = read(root, 'shop/test-bar.html')
     expect(bar).toContain('UGX 12,000')
     expect(bar).not.toContain('UGX 48,000')
   })
@@ -101,13 +101,13 @@ describe('prerendering per-product share pages', () => {
     })
     prerender({ root, origin: ORIGIN, log: () => {} })
 
-    const priced = read(root, 'shop/priced/index.html')
+    const priced = read(root, 'shop/priced.html')
     const jsonLd = JSON.parse(priced.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])
     expect(jsonLd['@type']).toBe('Product')
     expect(jsonLd.offers).toMatchObject({ price: '30000', priceCurrency: 'UGX', url: `${ORIGIN}/shop/priced` })
 
     for (const slug of ['unpriced', 'zero']) {
-      const html = read(root, `shop/${slug}/index.html`)
+      const html = read(root, `shop/${slug}.html`)
       expect(html).not.toContain('"@type":"Product"')
       expect(html).toContain('Price confirmed on WhatsApp')
     }
@@ -126,9 +126,9 @@ describe('prerendering per-product share pages', () => {
     })
     const manifest = prerender({ root, origin: ORIGIN, log: () => {} })
     expect(manifest.products).toEqual(['live'])
-    expect(existsSync(path.join(root, 'dist/shop/draft'))).toBe(false)
-    expect(existsSync(path.join(root, 'dist/shop/archived'))).toBe(false)
-    expect(existsSync(path.join(root, 'dist/shop/noslug'))).toBe(false)
+    expect(existsSync(path.join(root, 'dist/shop/draft.html'))).toBe(false)
+    expect(existsSync(path.join(root, 'dist/shop/archived.html'))).toBe(false)
+    expect(existsSync(path.join(root, 'dist/shop/noslug.html'))).toBe(false)
   })
 
   it('points the share card at the 1200x630 crop when the photo pipeline made one', () => {
@@ -142,7 +142,7 @@ describe('prerendering per-product share pages', () => {
       { photos: ['/images/products/photo-01.jpg', '/images/products/photo-01-share.jpg'] },
     )
     prerender({ root, origin: ORIGIN, log: () => {} })
-    const html = read(root, 'shop/photo/index.html')
+    const html = read(root, 'shop/photo.html')
     expect(html).toContain(`<meta property="og:image" content="${ORIGIN}/images/products/photo-01-share.jpg" />`)
     expect(html).toContain('<meta property="og:image:type" content="image/jpeg" />')
     expect(html).toContain('<meta property="og:image:width" content="1200" />')
@@ -159,7 +159,7 @@ describe('prerendering per-product share pages', () => {
     })
     prerender({ root, origin: ORIGIN, log: () => {} })
     for (const slug of ['nophoto', 'gone']) {
-      const html = read(root, `shop/${slug}/index.html`)
+      const html = read(root, `shop/${slug}.html`)
       expect(html).toContain(`<meta property="og:image" content="${ORIGIN}/og.png" />`)
       expect(html).toContain('<meta property="og:image:type" content="image/png" />')
     }
@@ -172,7 +172,7 @@ describe('prerendering per-product share pages', () => {
     })
     prerender({ root, origin: ORIGIN, log: () => {} })
 
-    const shop = read(root, 'shop/index.html')
+    const shop = read(root, 'shop.html')
     expect(shop).toContain('<title>Shop the collection · PURITY SKIN</title>')
     const itemList = JSON.parse(shop.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1])
     expect(itemList['@type']).toBe('ItemList')
@@ -189,7 +189,7 @@ describe('prerendering per-product share pages', () => {
     const root = makeProject({ settings, products: [] })
     const manifest = prerender({ root, origin: ORIGIN, log: () => {} })
     expect(manifest.products).toEqual([])
-    const shop = read(root, 'shop/index.html')
+    const shop = read(root, 'shop.html')
     expect(shop).toContain('Every PURITY SKIN product currently published')
     expect(shop).not.toContain('ItemList')
     expect(shop).toContain('256757377624')
@@ -210,7 +210,7 @@ describe('prerendering per-product share pages', () => {
       ],
     })
     prerender({ root, origin: ORIGIN, log: () => {} })
-    const html = read(root, 'shop/xss/index.html')
+    const html = read(root, 'shop/xss.html')
     expect(html).not.toContain('<script>alert(1)</script>')
     expect(html).not.toContain('<img src=x onerror=alert(1)>')
     expect(html).toContain('&lt;script&gt;alert(1)&lt;/script&gt;')
@@ -225,7 +225,7 @@ describe('prerendering per-product share pages', () => {
       products: [{ ...base, id: 'noscript', slug: 'noscript', name: 'No script (test only)', price_ugx: 7000, summary: 'A short honest summary.' }],
     })
     prerender({ root, origin: ORIGIN, log: () => {} })
-    const html = read(root, 'shop/noscript/index.html')
+    const html = read(root, 'shop/noscript.html')
     const noscript = html.match(/<noscript>([\s\S]*?)<\/noscript>/)[1]
     expect(noscript).toContain('No script (test only)')
     expect(noscript).toContain('UGX 7,000')

@@ -194,9 +194,11 @@ export function prerender({ root = process.cwd(), origin = DEFAULT_ORIGIN, catal
       businessName,
     })
 
-    const dir = path.join(dist, 'shop', slug)
-    mkdirSync(dir, { recursive: true })
-    writeFileSync(path.join(dir, 'index.html'), html, 'utf8')
+    // Written as shop/<slug>.html, not shop/<slug>/index.html: Cloudflare Pages
+    // 308-redirects /shop/<slug> to /shop/<slug>/ when the page is a directory
+    // index, and a canonical URL that redirects is a canonical URL wasted.
+    mkdirSync(path.join(dist, 'shop'), { recursive: true })
+    writeFileSync(path.join(dist, 'shop', `${slug}.html`), html, 'utf8')
     urls.push({ loc: url, changefreq: 'weekly', priority: '0.8' })
     written += 1
   }
@@ -229,8 +231,7 @@ export function prerender({ root = process.cwd(), origin = DEFAULT_ORIGIN, catal
       noscript: `        <h1 style="font-size:24px;margin:0 0 12px">${escapeHtml(businessName)}</h1>\n        <p style="line-height:1.6;color:#BDB2B6">This shop needs JavaScript to show the collection. You can still reach us on WhatsApp${whatsapp ? ` at ${whatsapp}` : ''} and we will confirm availability, prices and delivery directly.</p>`,
       businessName,
     })
-    mkdirSync(path.join(dist, 'shop'), { recursive: true })
-    writeFileSync(path.join(dist, 'shop', 'index.html'), html, 'utf8')
+    writeFileSync(path.join(dist, 'shop.html'), html, 'utf8')
     written += 1
   }
 

@@ -62,6 +62,13 @@ try {
   // /shop is prerendered: it must serve real HTML metadata, not just the shell.
   const deep = await get('/shop')
   check('/shop responds 200 with the app shell', deep.status === 200 && /<div id="root">/.test(deep.body), `status ${deep.status}`)
+  // A canonical URL must not redirect: /shop is written as shop.html, not shop/index.html.
+  const noRedirect = await fetch(`${base}/shop`, { redirect: 'manual' })
+  check(
+    '/shop is served directly, with no redirect',
+    noRedirect.status === 200,
+    `status ${noRedirect.status} — a directory index would 308 to /shop/ and the canonical link would point at a redirect`,
+  )
   check(
     '/shop carries its own title and canonical URL',
     /<title>[^<]*Shop the collection[^<]*<\/title>/.test(deep.body) &&
