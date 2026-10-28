@@ -13,3 +13,16 @@
 /*
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
+
+# The owner workspace and the local drafting studio should never appear in search.
+/owner
+  X-Robots-Tag: noindex, nofollow
+/owner/*
+  X-Robots-Tag: noindex, nofollow
+/studio/*
+  X-Robots-Tag: noindex, nofollow
+
+/robots.txt
+  Cache-Control: public, max-age=3600
+/sitemap.xml
+  Cache-Control: public, max-age=3600

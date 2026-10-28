@@ -1,7 +1,7 @@
 {
   "name": "PURITY SKIN",
   "short_name": "PURITY SKIN",
-  "description": "PURITY SKIN store and owner workspace",
+  "description": "PURITY SKIN \u2014 the skincare collection in Kampala, ordered on WhatsApp.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -9,7 +9,24 @@
   "background_color": "#141018",
   "theme_color": "#141018",
   "icons": [
-    { "src": "/icons/purity-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icons/purity-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
-  ]
+    {
+      "src": "/icons/purity-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/purity-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "shopping",
+    "lifestyle",
+    "health"
+  ],
+  "lang": "en-UG",
+  "dir": "ltr"
 }

@@ -1,7 +1,23 @@
 # Phase 7 · production rebuild status
 
 **Updated:** 2026-10-28 (Kampala)  
-**State:** committed and pushed to GitHub (`main` and `deploy`); quality gate passing locally and in CI; a Cloudflare Pages preview exists at `purityskin.pages.dev` but its build settings are wrong, so it serves unbuilt source; **not production-ready**.
+**State:** brand assets, catalogue layer and the multi-page storefront are built and pushed; quality gate passing locally and in CI; Cloudflare Pages still needs its build settings corrected; **no live database and no real catalogue content yet**.
+
+## Phase 8 · assets, catalogue and storefront (2026-10-28)
+
+- **Brand assets generated from SVG sources** with Chromium (`npm run assets`): 1200×630 share card (`og.png`), 512/192 PWA icons, 180 iOS touch icon, 32 favicon, vector icon. No stock or invented product imagery.
+- **Catalogue domain layer** (`src/catalog/`): typed products, publish gate, medical-claim screening, import normalisation that demotes unsafe published rows, browser-draft persistence, filtering helpers.
+- **Catalogue studio** at `/studio/catalogue` (noindex, no auth): full editor with live card preview, per-product publish checks, JSON export/import, autosave to this browser. Explicitly documented as a local drafting tool, not the owner workspace.
+- **Multi-page public site**: Home, Shop (filters + search), product detail, How to order, About, Policies, 404 — all honest when the catalogue is empty, all with WhatsApp handoff.
+- **Real 404 routing** (previously unknown paths redirected to `/`), plus per-page title/description/canonical/OG metadata.
+- **SEO/PWA plumbing**: `robots.txt`, `sitemap.xml`, `_headers` noindex for `/owner*` and `/studio/*`, service-worker cache bump to `v2`.
+- **Test coverage** extended to 30 unit tests (publish gate, import demotion, filtering, page honesty) and 26 Playwright checks across two viewports, including Axe on five routes.
+
+### Known gaps in this phase
+
+- Catalogue content is empty; the shop shows its honest "not published yet" state.
+- The studio is unauthenticated local editing. Real owner-only editing arrives with Supabase; until then publishing needs a Git commit.
+- Product photos do not exist; every card renders a photo slot.
 
 ## Implemented locally
 
@@ -19,9 +35,9 @@
 
 - Oxlint: 0 warnings, 0 errors.
 - TypeScript: passed.
-- Vitest: 4 unit tests passed.
+- Vitest: 30 unit tests passed.
 - Embedded PostgreSQL/PGlite migration + authorization/transaction tests passed: owner isolation, anonymous column grants, public image access vs owner-only upload, direct-write denial, stock RPC, duplicate-line oversell rollback, state transitions, cancellation stock reversal, and non-owner denial.
-- Playwright: 8/8 passed (mobile + desktop); no serious/critical Axe violations on the public page.
+- Playwright: 26/26 passed across phone and desktop viewports; no serious or critical Axe violations on `/`, `/shop`, `/how-to-order`, `/policies` or `/studio/catalogue`.
 - Cloudflare/Vite production build passed.
 - `npm audit --audit-level=low`: 0 vulnerabilities.
 - `node --check public/sw.js`: passed.

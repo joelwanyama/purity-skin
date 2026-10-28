@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="PURITY SKIN">
+  <rect width="1200" height="630" fill="#141018"/>
+  <circle cx="985" cy="315" r="210" fill="none" stroke="#3a2f47" stroke-width="2"/>
+  <circle cx="985" cy="315" r="150" fill="none" stroke="#574358" stroke-width="1.5"/>
+  <circle cx="985" cy="315" r="92" fill="none" stroke="#e88bb0" stroke-width="2" opacity="0.7"/>
+  <text x="995" y="315" fill="#f7c9dd" font-family="DejaVu Sans Mono,monospace" font-size="118" font-weight="700" letter-spacing="-8" text-anchor="middle" dominant-baseline="central">PS</text>
+  <text x="88" y="196" fill="#e88bb0" font-family="DejaVu Sans Mono,monospace" font-size="21" letter-spacing="7">KAMPALA · UGANDA</text>
+  <text x="86" y="312" fill="#f4eef8" font-family="DejaVu Sans,sans-serif" font-size="76" font-weight="bold" letter-spacing="-2">PURITY SKIN</text>
+  <text x="86" y="372" fill="#f7c9dd" font-family="DejaVu Sans,sans-serif" font-size="38" font-weight="bold">Formulated to fix.</text>
+  <text x="88" y="470" fill="#b7a8c7" font-family="DejaVu Sans,sans-serif" font-size="23">Browse the collection, then order on WhatsApp.</text>
+  <text x="88" y="512" fill="#b7a8c7" font-family="DejaVu Sans,sans-serif" font-size="23">No account needed. No invented prices.</text>
+  <line x1="88" y1="556" x2="1112" y2="556" stroke="#3a2f47" stroke-width="1"/>
+  <text x="88" y="590" fill="#8f829a" font-family="DejaVu Sans Mono,monospace" font-size="17" letter-spacing="4">PURITYSKIN.PAGES.DEV</text>
+</svg>

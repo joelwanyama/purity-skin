@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "note": "Committed catalogue. Empty on purpose: no product, size, price, photo or claim has been invented. Fill this in through /studio/catalogue, export the JSON, and commit it. docs/CATALOGUE.md explains the flow.",
+  "settings": {
+    "business_name": "PURITY SKIN",
+    "whatsapp_number": "256757377624",
+    "location": "Kampala, Uganda",
+    "delivery_summary": "",
+    "updated_at": "2026-10-28T00:00:00.000Z"
+  },
+  "products": []
+}

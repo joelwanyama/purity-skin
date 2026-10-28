@@ -2,15 +2,38 @@
 
 A customer-facing product catalogue with WhatsApp handoff, plus a private owner workspace for products, stock, orders and customer records. Built as a React/Vite single-page application for Cloudflare Workers + Static Assets, with Supabase Auth/Postgres as the planned backend.
 
-## Project status — production rebuild in progress
+## Project status
 
-This repository is a rebuild, **not yet production-ready**. A Cloudflare Pages project serves it, but only as a staging preview: no live Supabase project is connected, so the storefront truthfully reports that it is not set up. The app has first-pass storefront/owner screens, a reviewed-but-unapplied database migration, automated checks and a manual owner-bootstrap path. No live Supabase project has been configured and no production data has been imported, so the shop shows a truthful setup message rather than invented products, prices or stock.
+The public site is built and hostable. It has a real multi-page storefront, a documented catalogue workflow and generated brand assets. What it deliberately does **not** have is invented content: the committed catalogue ships empty, so the shop currently tells visitors the collection is still being prepared instead of showing sample prices.
 
-The earlier offline app and its JSON backup are migration sources and must remain untouched until a reviewed migration, reconciliation and explicit owner acceptance are complete.
+Three stages remain before it is a production business tool:
+
+1. **Content** — real products, prices and approved photos entered through the catalogue studio and committed.
+2. **Backend** — Supabase project, applied migration, invited owner, live auth (see `docs/PHASE7_STATUS.md`).
+3. **Launch checks** — WhatsApp number confirmed, claims reviewed, real-backend end-to-end test, custom domain.
+
+The earlier offline app and its JSON backup remain migration sources and must stay untouched until reconciliation and explicit owner acceptance.
+
+## The site
+
+| Route | What it is |
+| --- | --- |
+| `/` | Storefront: hero, published products, how ordering works, what the shop promises |
+| `/shop` | Full collection with type filters and search |
+| `/shop/:slug` | Product detail: price, description, facts, WhatsApp enquiry, related items |
+| `/how-to-order` | The four-step WhatsApp handoff, delivery and safety notes |
+| `/about` | How the shop works and what it will not claim |
+| `/policies` | Ordering, delivery, returns, claims, privacy, accessibility |
+| `/studio/catalogue` | **Local drafting tool** for catalogue content (noindex, no auth) |
+| `/owner` | Protected owner workspace shell (needs Supabase configuration) |
+| anything else | A real 404 page, not a blank screen |
+
+The public shop reads `src/catalog/catalog.data.json` through one hook (`useShopCatalog`). Swapping that file for Supabase later is an adapter change, not a rewrite — see `docs/CATALOGUE.md`.
 
 ## Customer journey
 
 - Public product browsing and WhatsApp enquiry do not require an account.
+- Prices come from the committed catalogue and are only shown for products that pass the publish gate (real price, pack size, approved photo, owner-confirmed, claims-checked).
 - A listing is public only when the owner publishes it and sets a confirmed UGX price. Product names/prices are never seeded as if live.
 - The site does not take payment. PURITY SKIN confirms availability, delivery and the final order in WhatsApp.
 - Customer-specific accounts/unlocks are **not implemented**. Future customer access must use individual invitation plus verified identity; it must not reuse owner login, expose the workspace, or allow cross-customer records.
@@ -25,6 +48,16 @@ The earlier offline app and its JSON backup are migration sources and must remai
 - Dashboard totals are computed from recorded orders only; not forecasts.
 
 The owner can upload approved product photos to a narrowly scoped public catalog bucket. Several business modules, admin settings, legacy-history import, production monitoring and customer-space features remain future work. UI screens are not proof that a live backend has been configured or tested.
+
+## Assets
+
+All brand imagery is generated from SVG sources by us — no stock photography, no invented product shots:
+
+```sh
+npm run assets     # regenerates og.png, PWA icons and favicon with Chromium
+```
+
+Product photos are **not** included. The shop renders a designed photo slot until an approved 4:5 photo is supplied. Format, naming, framing and colour rules are in `docs/ASSETS.md`.
 
 ## Local development
 

@@ -1,5 +1,5 @@
-const CACHE = 'purity-static-v1';
-const STATIC = ['/', '/manifest.webmanifest', '/icon.svg'];
+const CACHE = 'purity-static-v2';
+const STATIC = ['/', '/manifest.webmanifest', '/icon.svg', '/icons/purity-192.png', '/og.png'];
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(STATIC)).then(() => self.skipWaiting()));
 });
