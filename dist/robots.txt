@@ -1,9 +1,0 @@
-# Public pages are indexable. The owner workspace and the local drafting studio are not.
-User-agent: *
-Allow: /
-Disallow: /owner
-Disallow: /owner/
-Disallow: /studio/
-Disallow: /studio/catalogue
-
-Sitemap: https://purityskin.pages.dev/sitemap.xml

@@ -53,6 +53,17 @@ git push origin main && git push origin deploy
 
 Photos referenced in the JSON are root-relative (`/images/products/<slug>-01.jpg`), which is exactly where the ZIP puts them.
 
+## Interface (refined 2026-10-29)
+
+- **Three-step strip** at the top (Shop details → Products → Download) that fills in as you go and scrolls to each section.
+- **Product rail** with a thumbnail, a completion meter per product and a one-glance chip: `Draft`, `Live`, or a count of blocking checks.
+- **Addressable errors.** A problem appears under the field that causes it, and only after you have typed in that field or tried to publish — scanning an empty form never paints it red.
+- **Readiness pill** beside the product title ("4 of 8 done" → "Ready — can publish" → "Published").
+- **Grouped editor** (Basics · Words · Photo · Publish checks · Live preview) instead of one long form.
+- **Mobile action bar** with the product count, "Add product" and "Download", so the primary action is always reachable with a thumb.
+- **Keyboard:** `Ctrl/⌘ + S` downloads the ZIP, `Alt + A` adds a product.
+- Palette, type and spacing now follow the shop's own brand (greige accent, serif headings); every text/background pair passes WCAG AA and axe reports no violations at desktop or phone widths.
+
 ## Behaviour worth knowing
 
 - **Photos live in memory only.** After a reload or an import, a product that already has `image_path` shows "PHOTO ON FILE" instead of a broken image, and the owner can re-attach the file if it needs to be included again.

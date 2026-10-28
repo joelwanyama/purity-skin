@@ -1,5 +1,0 @@
-# Cloudflare Pages is a static host and does not fall back to index.html by itself.
-# The app uses client-side routing (BrowserRouter), so unmatched paths must return
-# the built app shell. Code 200 is a proxy/rewrite, not a redirect, so the URL stays.
-# Docs: https://developers.cloudflare.com/pages/configuration/redirects/#proxying
-/* /index.html 200

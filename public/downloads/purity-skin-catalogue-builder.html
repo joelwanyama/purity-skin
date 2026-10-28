@@ -5,144 +5,256 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>PURITY SKIN · Catalogue Builder</title>
 <style>
-  :root{
+:root{
     color-scheme: dark;
-    /* Palette from the official PURITY SKIN artwork: warm greige, ink, leaf green. */
-    --canvas:#0D0A0B; --surface:#191415; --raised:#221B1D; --line:#372E30;
-    --ink:#F4EFEF; --muted:#B3A6AB; --accent:#C2B7BD; --accent-ink:#14100F;
-    --accent-soft:#E6DEE0; --gold:#DAD7D9; --ok:#9DBF97; --bad:#E39A9A; --warn:#E7D3AC;
-    --radius:12px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    /* Palette sampled from the official PURITY SKIN artwork: greige, ink, leaf. */
+    --canvas:#0B0809; --surface:#171213; --raised:#201A1C; --line:#332B2D; --line-soft:#251F21;
+    --ink:#F5F1F1; --muted:#BDB2B6; --faint:#A2969A;
+    --accent:#C2B7BD; --accent-ink:#14100F; --accent-soft:#E8E1E3;
+    --ok:#9DBF97; --bad:#E39A9A; --warn:#E7D3AC;
+    --radius:14px; --radius-sm:10px;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
     --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
   }
   *{box-sizing:border-box}
-  html{scroll-padding-top:80px}
-  body{margin:0;min-width:320px;background:var(--canvas);color:var(--ink);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+  [hidden]{display:none!important}
+  html{scroll-padding-top:96px;-webkit-text-size-adjust:100%}
+  body{margin:0;min-width:320px;background:var(--canvas);color:var(--ink);font:14px/1.55 var(--font);-webkit-font-smoothing:antialiased}
   h1,h2,h3,p{margin-top:0}
-  h1{font-size:26px;line-height:1.15;letter-spacing:-.03em;margin-bottom:8px}
-  h2{font-size:16px;line-height:1.3;letter-spacing:-.01em;margin-bottom:0}
-  h3{font-size:13px;margin-bottom:0}
-  p{line-height:1.6}
+  h1{font:600 clamp(24px,3.4vw,34px)/1.1 var(--serif);letter-spacing:-.015em;margin-bottom:10px}
+  h2{font:600 17px/1.3 var(--serif);letter-spacing:-.005em;margin-bottom:0}
+  h3{font:600 12px/1.3 var(--font);margin-bottom:0}
+  p{line-height:1.62}
   a{color:var(--accent-soft)}
-  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:4px}
   ::selection{background:var(--accent);color:var(--accent-ink)}
   .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 clamp(14px,4vw,40px)}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 clamp(14px,4vw,36px)}
+  .eyebrow{margin:0 0 8px;color:var(--accent);font:600 10px var(--mono);letter-spacing:.14em;text-transform:uppercase}
+  .lede{color:var(--muted);font-size:13px;max-width:62ch;margin:0}
+  .muted{color:var(--muted)}
+  .faint{color:var(--faint)}
 
-  header.top{position:sticky;top:0;z-index:20;background:rgba(13,10,11,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
-  .top-inner{display:flex;align-items:center;gap:14px;min-height:66px;flex-wrap:wrap;padding:10px 0}
-  .brand{display:flex;align-items:center;gap:10px;margin-right:auto}
-  .mono-badge{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--accent)}
+  /* ---------- header ---------- */
+  header.top{position:sticky;top:0;z-index:40;background:rgba(11,8,9,.92);border-bottom:1px solid var(--line);backdrop-filter:blur(10px)}
+  .top-inner{display:flex;align-items:center;gap:12px;min-height:64px;flex-wrap:wrap;padding:9px 0}
+  .brand{display:flex;align-items:center;gap:11px;margin-right:auto;min-width:0}
+  .mono-badge{width:38px;height:38px;flex:none;display:grid;place-items:center;border:1px solid #4A4044;border-radius:var(--radius-sm);overflow:hidden;background:var(--accent)}
   .mono-badge img{width:100%;height:100%;display:block;object-fit:cover}
-  .brand strong{display:block;font-size:12px;letter-spacing:.1em}
-  .brand small{display:block;margin-top:2px;font:500 9px var(--mono);letter-spacing:.08em;color:var(--muted)}
+  .brand-name{display:block;font:600 12px var(--font);letter-spacing:.16em;white-space:nowrap}
+  .brand-sub{display:block;margin-top:3px;font:500 9px var(--mono);letter-spacing:.12em;color:var(--muted);white-space:nowrap}
+  .top-actions{display:flex;align-items:center;gap:8px}
 
-  .btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 13px;border:1px solid transparent;border-radius:var(--radius);background:transparent;color:var(--ink);font:600 12px var(--font);cursor:pointer;transition:background-color .14s ease-out,border-color .14s ease-out,transform .14s ease-out}
+  /* ---------- buttons ---------- */
+  .btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 14px;border:1px solid transparent;border-radius:var(--radius-sm);background:transparent;color:var(--ink);font:600 12px var(--font);cursor:pointer;transition:background-color .14s ease-out,border-color .14s ease-out,color .14s ease-out,transform .14s ease-out;white-space:nowrap}
   .btn:hover{transform:translateY(-1px)}
-  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-  .btn-primary{background:var(--accent);color:var(--accent-ink)}
-  .btn-primary:hover:not(:disabled){background:var(--accent-soft)}
+  .btn:active{transform:translateY(0)}
+  .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+  .btn-primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+  .btn-primary:hover:not(:disabled){background:var(--accent-soft);border-color:var(--accent-soft)}
   .btn-secondary{background:var(--raised);border-color:var(--line)}
-  .btn-secondary:hover:not(:disabled){border-color:var(--accent);color:var(--accent-soft)}
-  .btn-quiet{color:var(--accent-soft);border-color:transparent;background:transparent}
-  .btn-danger{background:#38212b;border-color:#5C3B40;color:var(--bad)}
+  .btn-secondary:hover:not(:disabled){border-color:var(--accent);color:#fff}
+  .btn-quiet{color:var(--muted);border-color:transparent;background:transparent}
+  .btn-quiet:hover:not(:disabled){color:var(--ink);background:var(--raised)}
+  .btn-danger{background:#2A1A1C;border-color:#54353A;color:var(--bad)}
+  .btn-danger:hover:not(:disabled){background:#341F22;border-color:#73504F}
   .btn-small{min-height:32px;padding:5px 10px;font-size:11px}
+  .btn-block{width:100%}
+  .btn svg{flex:none}
 
-  main{padding:26px 0 80px}
-  .intro{margin-bottom:22px;max-width:760px}
-  .intro p{color:var(--muted);margin-bottom:10px}
-  .kicker{margin:0 0 7px;color:var(--accent);font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
-  .notice{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-radius:var(--radius);background:var(--raised);font-size:12px;color:var(--muted);margin-bottom:20px}
-  .notice b{color:var(--ink)}
-  .notice svg{flex:none;margin-top:1px;color:var(--accent-soft)}
-  .status{margin:0 0 16px;padding:10px 13px;border:1px solid var(--line);border-radius:var(--radius);font-size:12px;background:var(--surface)}
-  .status.ok{border-color:#3E5540;background:#16201A;color:#B9D4B4}
-  .status.warn{border-color:#5A4A33;background:#251f16;color:#E7D3AC}
-  .status.bad{border-color:#5C3B40;background:#241A1C;color:#E9B9B9}
+  /* ---------- page rhythm ---------- */
+  main{padding:24px 0 96px}
+  .intro{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:end;margin-bottom:18px}
+  .intro-chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted);font:500 10px var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  .pill svg{color:var(--accent)}
+
+  /* ---------- progress steps ---------- */
+  .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:18px;padding:0;list-style:none}
+  .steps li{min-width:0}
+  .step{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);color:var(--muted);text-align:left;font:600 12px var(--font);cursor:pointer;transition:border-color .14s ease-out,background-color .14s ease-out}
+  .step:hover{border-color:var(--accent);color:var(--ink)}
+  .step .num{width:22px;height:22px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;font:600 10px var(--mono);color:var(--muted);background:var(--canvas)}
+  .step .label{display:grid;gap:1px;min-width:0}
+  .step .label b{font-size:12px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .step .label small{font:500 9px var(--mono);letter-spacing:.08em;color:var(--muted);text-transform:uppercase}
+  .step.is-done{border-color:#3E5540;background:#151E18}
+  .step.is-done .num{border-color:#3E5540;background:#2A3A2C;color:#C6DEC1}
+  .step.is-current{border-color:var(--accent);background:var(--raised)}
+  .step.is-current .num{border-color:var(--accent);background:var(--accent);color:var(--accent-ink)}
+
+  /* ---------- status line ---------- */
+  .status{margin:0 0 16px;padding:11px 14px;border:1px solid var(--line);border-radius:var(--radius-sm);font-size:12px;background:var(--surface)}
+  .status.ok{border-color:#3E5540;background:#151E18;color:#C6DEC1}
+  .status.warn{border-color:#5A4A33;background:#221C14;color:var(--warn)}
+  .status.bad{border-color:#54353A;background:#251A1C;color:var(--bad)}
   .status:empty{display:none}
 
+  /* ---------- panels ---------- */
   .panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:18px;margin-bottom:16px}
-  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-  .panel-head small{color:var(--muted);font-size:11px}
+  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+  .panel-head .title{display:flex;align-items:center;gap:10px;min-width:0}
+  .step-badge{width:26px;height:26px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--raised);color:var(--accent);font:600 10px var(--mono)}
+  .panel-head small{color:var(--faint);font-size:11px}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
   .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
 
-  .field{display:grid;gap:6px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
-  .field input,.field select,.field textarea{width:100%;min-height:42px;padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);color:var(--ink);font:400 14px var(--font);outline:none}
-  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px #C2B7BD33}
-  .field textarea{min-height:96px;resize:vertical;line-height:1.55}
-  .field small{font-size:11px;font-weight:400;color:var(--muted)}
-  .field .counter{font:500 10px var(--mono);color:var(--muted)}
+  /* ---------- fields ---------- */
+  .field{display:grid;gap:6px;font:600 11px var(--font);color:var(--muted);min-width:0;letter-spacing:.02em}
+  .field input,.field select,.field textarea{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--canvas);color:var(--ink);font:400 14px var(--font);outline:none;transition:border-color .14s ease-out,box-shadow .14s ease-out}
+  .field textarea{min-height:104px;resize:vertical;line-height:1.6}
+  .field input:hover,.field select:hover,.field textarea:hover{border-color:#453B3E}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,183,189,.16)}
+  .field small{font-size:11px;font-weight:400;color:var(--faint);letter-spacing:0}
+  .field input::placeholder,.field textarea::placeholder{color:#9A8F93;opacity:1}
+  .field .counter{font:500 10px var(--mono);color:var(--muted);justify-self:end;letter-spacing:.04em}
+  .field .counter.over{color:var(--bad)}
+  .field .counter.at-target{color:var(--ok)}
+  .field[data-invalid="true"] input,.field[data-invalid="true"] textarea,.field[data-invalid="true"] select{border-color:#6E4448;background:#1A1113}
+  .field-error{display:none;margin:0;color:var(--bad);font:500 11px var(--font);letter-spacing:0}
+  .field[data-invalid="true"] .field-error{display:block}
+  .group{display:grid;gap:12px;padding:16px 0;border-top:1px solid var(--line-soft)}
+  .group:first-of-type{border-top:0;padding-top:4px}
+  .group-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 2px;color:var(--accent);font:600 10px var(--mono);letter-spacing:.13em;text-transform:uppercase}
+  .group-title span{color:var(--muted);letter-spacing:.02em;text-transform:none;font:400 11px var(--font)}
 
-  .cols{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
-  .list{margin:0;padding:0;list-style:none;display:grid;gap:7px;max-height:min(64vh,620px);overflow:auto}
+  /* ---------- layout: rail + editor ---------- */
+  .shell{display:grid;grid-template-columns:308px minmax(0,1fr);gap:16px;align-items:start;margin-bottom:16px}
+  .rail{position:sticky;top:84px;display:grid;gap:12px}
+  .rail .panel{margin-bottom:0}
+  .list{margin:0;padding:0;list-style:none;display:grid;gap:6px;max-height:min(48vh,460px);overflow:auto;scrollbar-width:thin}
   .list li{display:block}
-  .list button.item{width:100%;display:flex;justify-content:space-between;gap:9px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);color:var(--ink);text-align:left;cursor:pointer}
-  .list button.item[aria-current="true"]{border-color:var(--accent);background:#241b2c}
-  .list .name{display:grid;gap:2px;min-width:0}
-  .list .name b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .list .name small{color:var(--muted);font-size:10px}
-  .list .right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-  .chip{padding:2px 7px;border:1px solid var(--line);border-radius:999px;font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
-  .chip.pub{border-color:#3E5540;background:#16201A;color:#B9D4B4}
-  .chip.blocked{border-color:#5C3B40;background:#241A1C;color:var(--bad)}
+  .item{width:100%;display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:center;padding:9px 10px;border:1px solid var(--line);border-left:3px solid transparent;border-radius:var(--radius-sm);background:var(--canvas);color:var(--ink);text-align:left;cursor:pointer;transition:border-color .14s ease-out,background-color .14s ease-out}
+  .item:hover{border-color:#4A4044;background:#141011}
+  .item[aria-current="true"]{border-color:var(--accent);border-left-color:var(--accent);background:#1C1719}
+  .thumb{width:40px;height:50px;flex:none;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--raised);display:grid;place-items:center}
+  .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+  .thumb .empty-mark{font:700 13px var(--mono);color:#BDB2B6}
+  .item-body{min-width:0;display:grid;gap:4px}
+  .item-top{display:flex;align-items:center;gap:6px;min-width:0}
+  .item-name{font:600 12px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1}
+  .item-meta{color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .meter{height:3px;border-radius:2px;background:#2A2325;overflow:hidden}
+  .meter i{display:block;height:100%;border-radius:2px;background:var(--accent);transition:width .2s ease-out}
+  .meter.is-done i{background:var(--ok)}
+  .chip{padding:2px 7px;border:1px solid var(--line);border-radius:999px;font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap;flex:none}
+  .chip.pub{border-color:#3E5540;background:#16201A;color:#C6DEC1}
+  .chip.blocked{border-color:#54353A;background:#241A1C;color:var(--bad)}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .stat{padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--canvas)}
+  .stat strong{display:block;font:600 19px var(--serif);color:var(--accent-soft);font-variant-numeric:tabular-nums;line-height:1.2}
+  .stat span{color:var(--muted);font:500 9px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+  .empty{padding:20px 16px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed #3B3235;border-radius:var(--radius-sm);margin:0}
 
-  .gate{display:grid;gap:9px;padding:14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--raised);margin-top:2px}
-  .gate-title{margin:0;color:var(--accent);font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  /* ---------- editor ---------- */
+  #editor-panel{min-width:0}
+  .editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .editor-title-block{min-width:0}
+  .readiness{display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--canvas);font:500 10px var(--mono);letter-spacing:.06em;color:var(--muted);white-space:nowrap}
+  .readiness.is-ready{border-color:#3E5540;background:#16201A;color:#C6DEC1}
+  .readiness .dot{width:6px;height:6px;border-radius:50%;background:var(--faint)}
+  .readiness.is-ready .dot{background:var(--ok)}
+  .editor-actions{display:flex;gap:7px;flex-wrap:wrap}
+
+  .photo-row{display:grid;grid-template-columns:132px minmax(0,1fr);gap:14px;align-items:start}
+  .photo-box{position:relative;aspect-ratio:4/5;border:1px dashed #453B3E;border-radius:var(--radius-sm);background:var(--canvas);display:grid;place-items:center;overflow:hidden}
+  .photo-box img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo-box .ph{display:grid;justify-items:center;gap:7px;color:var(--faint);font:600 9px var(--mono);letter-spacing:.12em;text-align:center;padding:8px}
+  .photo-box .ph small{font:400 9px var(--font);letter-spacing:0;color:var(--faint);word-break:break-all}
+  .photo-actions{display:grid;gap:8px;align-content:start}
+  .photo-actions .row{display:flex;gap:7px;flex-wrap:wrap}
+  .file-input{display:block;width:100%;padding:9px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--canvas);color:var(--muted);font-size:12px}
+  .file-input::file-selector-button{min-height:30px;margin-right:10px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--raised);color:var(--ink);font:600 11px var(--font);cursor:pointer}
+  .meta{font:500 10px var(--mono);color:var(--muted);letter-spacing:.03em;line-height:1.8;margin:0}
+  .meta code{font-size:10px}
+
+  /* ---------- checks ---------- */
+  .gate{display:grid;gap:11px;padding:15px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--canvas)}
   .checks{display:grid;gap:7px;margin:0;padding:0;list-style:none;font-size:12px}
-  .checks li{display:flex;gap:7px;align-items:flex-start;line-height:1.5}
+  .checks li{display:flex;gap:8px;align-items:flex-start;line-height:1.5}
   .checks svg{flex:none;margin-top:2px}
-  .checks.errors li{color:#E9B9B9}
-  .checks.warns li{color:#E7D3AC}
-  .pass{display:flex;align-items:center;gap:7px;margin:0;color:#B9D4B4;font-size:12px}
-  .toggle{display:flex;gap:10px;align-items:flex-start;padding:11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas)}
-  .toggle input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);flex:none}
-  .toggle span{display:grid;gap:2px}
-  .toggle b{font-size:12px;color:var(--ink)}
+  .checks.errors li{color:var(--bad)}
+  .checks.warns li{color:var(--warn)}
+  .pass{display:flex;align-items:center;gap:8px;margin:0;color:#C6DEC1;font-size:12px}
+  fieldset.toggles{border:0;margin:0;padding:0;display:grid;gap:8px;min-width:0}
+  fieldset.toggles legend{padding:0;margin-bottom:2px}
+  .toggle{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;padding:11px 12px;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);cursor:pointer}
+  .toggle:hover{border-color:#4A4044}
+  .toggle:has(input:checked){border-color:#3E5540;background:#16201A}
+  .toggle input{width:18px;height:18px;margin:1px 0 0;accent-color:var(--accent);flex:none;cursor:pointer}
+  .toggle span{display:grid;gap:2px;min-width:0}
+  .toggle b{font-size:12px;color:var(--ink);font-weight:600}
   .toggle small{font-size:11px;color:var(--muted)}
 
-  .photo-row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;align-items:start}
-  .photo-box{position:relative;aspect-ratio:4/5;border:1px dashed #4a3a58;border-radius:var(--radius);background:var(--canvas);display:grid;place-items:center;overflow:hidden}
-  .photo-box img{width:100%;height:100%;object-fit:cover;display:block}
-  .photo-box .ph{display:grid;justify-items:center;gap:6px;color:#8A7F83;font:600 9px var(--mono);letter-spacing:.12em}
-  .photo-box .ph span{font-size:26px;letter-spacing:-.1em;color:#7A6F73}
-  .photo-actions{display:grid;gap:9px;align-content:start}
-  .file-input{display:block;width:100%;padding:8px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);color:var(--muted);font-size:12px}
-  .meta{font:500 10px var(--mono);color:var(--muted);letter-spacing:.04em;line-height:1.8}
-
-  .preview{display:grid;gap:8px;margin-top:4px}
-  .card{border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);overflow:hidden;max-width:260px}
-  .card .vis{aspect-ratio:4/5;min-height:120px;display:grid;place-items:center;background:var(--surface);border-bottom:1px solid var(--line);color:#7A6F73;font:700 30px var(--mono);letter-spacing:-.1em;overflow:hidden}
-  .card .vis img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px 8px 0 0}
+  /* ---------- card preview ---------- */
+  .preview{display:grid;gap:9px;justify-items:start}
+  .card{border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);overflow:hidden;max-width:250px;width:100%}
+  .card .vis{aspect-ratio:4/5;min-height:120px;display:grid;place-items:center;background:var(--surface);border-bottom:1px solid var(--line);overflow:hidden}
+  .card .vis img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .vis .mark{font:700 30px var(--mono);letter-spacing:-.1em;color:#BDB2B6}
   .card .body{display:grid;gap:5px;padding:11px 12px 13px}
-  .card .meta-row{display:flex;justify-content:space-between;color:var(--muted);font:600 9px var(--mono);letter-spacing:.08em;text-transform:uppercase}
-  .card .body b{font-size:13px}
+  .card .meta-row{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font:600 9px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+  .card .body b{font-size:13px;line-height:1.3}
   .card .body p{margin:0;color:var(--muted);font-size:11px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .card .price{color:var(--gold);font-size:12px;font-weight:700}
+  .card .price{color:var(--accent-soft);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
 
-  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
-  .stats div{padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
-  .stats strong{display:block;font-size:20px;color:var(--accent-soft);font-variant-numeric:tabular-nums}
-  .stats span{color:var(--muted);font-size:10px}
-  .empty{padding:22px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:var(--radius)}
-  .export-bar{display:flex;gap:9px;flex-wrap:wrap}
+  /* ---------- finish ---------- */
+  .finish-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,340px);gap:18px}
+  .file-list{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+  .file-list li{display:grid;grid-template-columns:16px minmax(0,1fr);gap:9px;align-items:start;font-size:12px;color:var(--muted);line-height:1.55}
+  .file-list svg{margin-top:3px;color:var(--accent)}
+  .export-bar{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-top:16px;padding-top:16px;border-top:1px solid var(--line-soft)}
+  .export-bar .spacer{flex:1}
   code{font:500 11px var(--mono);color:var(--accent-soft);background:var(--raised);padding:1px 5px;border-radius:5px;word-break:break-word}
-  textarea.notes{min-height:80px}
-  footer{padding:20px 0 40px;color:var(--muted);font-size:11px;line-height:1.8}
+  textarea.notes{min-height:88px}
+  .next-steps{display:grid;gap:8px;margin:0;padding:0;list-style:none;counter-reset:step}
+  .next-steps li{display:grid;grid-template-columns:18px minmax(0,1fr);gap:9px;font-size:12px;color:var(--muted);line-height:1.55}
+  .next-steps li::before{counter-increment:step;content:counter(step);display:grid;place-items:center;width:18px;height:18px;border:1px solid var(--line);border-radius:50%;font:600 9px var(--mono);color:var(--accent)}
+  footer{padding:16px 0 32px;color:var(--muted);font-size:11px;line-height:1.8;max-width:80ch}
 
-  @media (max-width:600px){
-    .top-inner{gap:8px;padding:8px 0}
-    .brand small{display:none}
-    .brand strong{font-size:11px}
-    .top-inner .btn{padding:7px 10px;font-size:11px;min-height:36px}
+  /* ---------- mobile action bar ---------- */
+  .bottombar{position:fixed;left:0;right:0;bottom:0;z-index:50;display:none;align-items:center;gap:10px;padding:10px clamp(12px,4vw,20px) calc(10px + env(safe-area-inset-bottom));background:rgba(17,13,14,.96);border-top:1px solid var(--line);backdrop-filter:blur(10px)}
+  .bottombar .count{min-width:0;flex:1}
+  .bottombar .count b{display:block;font:600 12px var(--font);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bottombar .count span{display:block;font:500 10px var(--mono);color:var(--muted);letter-spacing:.05em}
+  .bottombar .btn{flex:none}
+
+  /* ---------- responsive ---------- */
+  @media (max-width:1080px){
+    .shell{grid-template-columns:260px minmax(0,1fr)}
+    .rail{position:static}
+    .list{max-height:none}
   }
   @media (max-width:900px){
-    .cols{grid-template-columns:1fr}
-    .list{max-height:none}
+    .intro{grid-template-columns:1fr;align-items:start}
+    .intro-chips{justify-content:flex-start}
+    .shell{grid-template-columns:1fr}
+    .finish-grid{grid-template-columns:1fr}
     .grid-2,.grid-3{grid-template-columns:1fr}
-    .stats{grid-template-columns:1fr 1fr}
-    .photo-row{grid-template-columns:110px minmax(0,1fr)}
+    .photo-row{grid-template-columns:112px minmax(0,1fr)}
+    .bottombar{display:flex}
+    main{padding-bottom:120px}
+  }
+  @media (max-width:600px){
+    .top-inner{gap:8px;padding:8px 0;min-height:58px}
+    .brand-sub{display:none}
+    .brand-name{font-size:11px;letter-spacing:.12em}
+    .top-actions .btn{padding:7px 10px;font-size:11px;min-height:36px}
+    .steps{grid-template-columns:1fr 1fr 1fr;gap:5px}
+    .step{padding:8px 7px;gap:7px}
+    .step .num{width:18px;height:18px;font-size:9px}
+    .step .label b{font-size:10px}
+    .step .label small{display:none}
+    .panel{padding:14px}
+    .editor-head{gap:8px}
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* ---------- notice strip ---------- */
+  .notice{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius-sm);background:var(--raised);font-size:12px;color:var(--muted);margin-bottom:18px;line-height:1.6}
+  .notice b{color:var(--ink)}
+  .notice svg{flex:none;margin-top:2px;color:var(--accent)}
 </style>
 </head>
 <body>
@@ -150,40 +262,61 @@
   <div class="wrap top-inner">
     <div class="brand">
       <span class="mono-badge" aria-hidden="true"><img alt="" width="36" height="36" src="data:image/png;base64,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" /></span>
-      <span><strong>PURITY SKIN</strong><small>CATALOGUE BUILDER</small></span>
+      <span><span class="brand-name">PURITY SKIN</span><span class="brand-sub">CATALOGUE BUILDER · WORKS OFFLINE</span></span>
     </div>
-    <button class="btn btn-secondary" id="btn-import" type="button">Import a file</button>
-    <input id="import-input" class="sr-only" type="file" accept="application/json,.json,.zip,application/zip" aria-label="Import a previously exported catalogue JSON" />
-    <button class="btn btn-primary" id="btn-export" type="button">Download everything</button>
+    <div class="top-actions">
+      <button class="btn btn-secondary" id="btn-import" type="button">Import a file</button>
+      <input id="import-input" class="sr-only" type="file" accept="application/json,.json,.zip,application/zip" aria-label="Import a previously exported catalogue JSON" />
+      <button class="btn btn-primary" id="btn-export" type="button">Download everything</button>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
   <div class="intro">
-    <p class="kicker">STEP ONE OF THE CATALOGUE</p>
-    <h1>Fill this in, download it, send it back.</h1>
-    <p>This page runs entirely in your browser. Nothing is uploaded anywhere and it does not need internet. Enter your real products, attach the photos you want used, then press <b>Download everything</b> — you get one ZIP file containing the catalogue JSON and every photo, already named correctly. Send that ZIP over and it can be dropped straight into the shop.</p>
+    <div>
+      <p class="eyebrow">Fill in · download · send back</p>
+      <h1>Your catalogue, filled in by you.</h1>
+      <p class="lede">This page runs entirely in your browser. Nothing is uploaded anywhere and it needs no internet. Enter your real products, attach the photos you want used, then download a single ZIP. Send that back and it drops straight into the shop.</p>
+    </div>
+    <div class="intro-chips">
+      <span class="pill">Works offline</span>
+      <span class="pill">Nothing uploaded</span>
+      <span class="pill">Saves as you type</span>
+    </div>
   </div>
+
+  <nav aria-label="Progress through the catalogue">
+    <ol class="steps">
+      <li><button class="step" type="button" data-goto="step-shop" id="step-shop-btn">
+        <span class="num" id="step-shop-num" aria-hidden="true">1</span>
+        <span class="label"><b>Shop details</b><small id="step-shop-state">Start here</small></span>
+      </button></li>
+      <li><button class="step" type="button" data-goto="step-products" id="step-products-btn">
+        <span class="num" id="step-products-num" aria-hidden="true">2</span>
+        <span class="label"><b>Products</b><small id="step-products-state">None yet</small></span>
+      </button></li>
+      <li><button class="step" type="button" data-goto="step-finish" id="step-finish-btn">
+        <span class="num" id="step-finish-num" aria-hidden="true">3</span>
+        <span class="label"><b>Download</b><small id="step-finish-state">Not yet</small></span>
+      </button></li>
+    </ol>
+  </nav>
 
   <div class="notice">
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-    <div><b>Two rules that keep the shop honest:</b> only publish a product when the price is the real one you charge and the photo is one you own. Anything you leave unconfirmed stays a draft and never appears on the public site.</div>
+    <div><b>Two rules keep the shop honest:</b> only publish a product when the price is the real one you charge and the photo is one you own. Anything you leave unconfirmed stays a draft and never appears on the public site.</div>
   </div>
 
   <p class="status" id="status" role="status" aria-live="polite"></p>
 
-  <div class="stats" aria-hidden="true">
-    <div><strong id="stat-products">0</strong><span>products</span></div>
-    <div><strong id="stat-published">0</strong><span>ready to publish</span></div>
-    <div><strong id="stat-photos">0</strong><span>photos attached</span></div>
-    <div><strong id="stat-blocked">0</strong><span>blocked by checks</span></div>
-  </div>
-
-  <!-- Shop details -->
-  <section class="panel" aria-labelledby="shop-title">
+  <!-- 01 · Shop details -->
+  <section class="panel" id="step-shop" aria-labelledby="shop-title">
     <div class="panel-head">
-      <div><p class="kicker">A · SHOP DETAILS</p><h2 id="shop-title">How customers reach you</h2></div>
-      <small>Used in the header, footer and every WhatsApp button</small>
+      <div class="title">
+        <span class="step-badge" aria-hidden="true">01</span>
+        <div><h2 id="shop-title">Shop details</h2><small>Used in the header, footer and every WhatsApp button</small></div>
+      </div>
     </div>
     <div class="grid-2">
       <label class="field">Business name
@@ -203,90 +336,119 @@
     </div>
   </section>
 
-  <!-- Products -->
-  <div class="cols">
-    <section class="panel" aria-labelledby="list-title" style="margin-bottom:0">
-      <div class="panel-head">
-        <h2 id="list-title">Products</h2>
-        <button class="btn btn-secondary btn-small" id="btn-add" type="button">Add product</button>
-      </div>
-      <ul class="list" id="product-list"></ul>
-      <p id="list-empty" class="empty">No products yet. Press “Add product” to start with your first real one.</p>
-    </section>
+  <!-- 02 · Products -->
+  <div class="shell" id="step-products">
+    <div class="rail">
+      <section class="panel" aria-labelledby="list-title">
+        <div class="panel-head" style="margin-bottom:12px">
+          <div class="title">
+            <span class="step-badge" aria-hidden="true">02</span>
+            <div><h2 id="list-title">Products</h2><small id="list-count">None yet</small></div>
+          </div>
+        </div>
+        <ul class="list" id="product-list"></ul>
+        <p id="list-empty" class="empty">No products yet.<br />Add your first real one below.</p>
+        <button class="btn btn-primary btn-block" id="btn-add" type="button" style="margin-top:12px">Add product</button>
+      </section>
 
-    <section class="panel" aria-labelledby="editor-title" id="editor-panel">
-      <div class="panel-head">
-        <div><p class="kicker">B · PRODUCT DETAILS</p><h2 id="editor-title">Nothing selected</h2></div>
-        <div style="display:flex;gap:7px">
+      <section class="panel" aria-label="Catalogue totals">
+        <div class="stats" aria-hidden="true">
+          <div class="stat"><strong id="stat-products">0</strong><span>products</span></div>
+          <div class="stat"><strong id="stat-published">0</strong><span>published</span></div>
+          <div class="stat"><strong id="stat-photos">0</strong><span>photos</span></div>
+          <div class="stat"><strong id="stat-blocked">0</strong><span>blocked</span></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel" id="editor-panel" aria-labelledby="editor-title">
+      <div class="editor-head">
+        <div class="editor-title-block">
+          <p class="eyebrow" style="margin-bottom:6px">Product details</p>
+          <h2 id="editor-title">Nothing selected</h2>
+        </div>
+        <div class="editor-actions">
+          <span class="readiness" id="readiness"><span class="dot" aria-hidden="true"></span><span id="readiness-text">No product</span></span>
           <button class="btn btn-secondary btn-small" id="btn-duplicate" type="button" hidden>Duplicate</button>
           <button class="btn btn-danger btn-small" id="btn-delete" type="button" hidden>Remove</button>
         </div>
       </div>
 
-      <p id="editor-empty" class="empty">Add a product, or pick one from the list, to fill in its details.</p>
+      <p id="editor-empty" class="empty" style="margin-top:14px">Add a product, or pick one from the list, to fill in its details.</p>
 
       <div id="editor-body" hidden>
-        <div class="grid-2">
-          <label class="field">Product name
-            <input id="p-name" type="text" placeholder="Exactly as printed on the pack" />
-            <small id="slug-hint">Link: /shop/…</small>
-          </label>
-          <label class="field">Page link (slug)
-            <input id="p-slug" type="text" placeholder="auto from the name" />
-            <small>Letters, numbers and dashes. Leave it alone unless you need a specific link.</small>
-          </label>
-          <label class="field">Product type
-            <input id="p-category" type="text" list="category-options" placeholder="Serum" />
-            <datalist id="category-options">
-              <option value="Serum"></option><option value="Cleanser"></option><option value="Toner"></option>
-              <option value="Moisturiser"></option><option value="Sunscreen"></option><option value="Soap"></option>
-              <option value="Scrub"></option><option value="Oil"></option><option value="Mask"></option>
-              <option value="Body lotion"></option><option value="Lip care"></option>
-            </datalist>
-          </label>
-          <label class="field">Pack size
-            <input id="p-size" type="text" placeholder="30 ml" />
-            <small>Exactly what the pack says: 30 ml, 120 g, 1 bar.</small>
-          </label>
-          <label class="field">Price in UGX
-            <input id="p-price" type="number" inputmode="numeric" min="0" step="100" placeholder="Leave empty until confirmed" />
-            <small>The real price you charge. Whole shillings, no decimals.</small>
-          </label>
-          <label class="field">Selling status
-            <select id="p-status">
-              <option value="draft">Draft — hidden from the shop</option>
-              <option value="published">Published — visible in the shop</option>
-            </select>
-            <small>Publishing is only allowed once every check below passes.</small>
-          </label>
-        </div>
-
-        <div class="field" style="margin-top:13px">
-          <label for="p-summary">One-line summary</label>
-          <input id="p-summary" type="text" maxlength="120" placeholder="Shown on product cards. Keep it factual." />
-          <span class="counter"><span id="summary-count">0</span>/120</span>
-        </div>
-
-        <div class="field" style="margin-top:13px">
-          <label for="p-description">Description</label>
-          <textarea id="p-description" placeholder="What it is, what it is used for, how to use it. No medical claims."></textarea>
-          <span class="counter"><span id="desc-count">0</span>/40 characters minimum</span>
-        </div>
-
-        <div class="panel" style="background:var(--raised);margin:14px 0 0">
-          <div class="panel-head" style="margin-bottom:12px">
-            <div><p class="kicker">C · PHOTO</p><h3>Product photo</h3></div>
-            <small>4:5 portrait, cropped automatically</small>
+        <div class="group">
+          <p class="group-title">Basics <span>What it is and what it costs</span></p>
+          <div class="grid-2">
+            <label class="field" id="field-name">Product name
+              <input id="p-name" type="text" placeholder="Exactly as printed on the pack" />
+              <p class="field-error" id="err-name"></p>
+              <small id="slug-hint">Link: /shop/…</small>
+            </label>
+            <label class="field" id="field-slug">Page link
+              <input id="p-slug" type="text" placeholder="auto from the name" />
+              <small>Letters, numbers and dashes. Leave it alone unless you have already shared the link.</small>
+            </label>
+            <label class="field" id="field-category">Product type
+              <input id="p-category" type="text" list="category-options" placeholder="Serum" />
+              <p class="field-error" id="err-category"></p>
+              <datalist id="category-options">
+                <option value="Cleanser"></option>
+                <option value="Serum"></option>
+                <option value="Moisturiser"></option>
+                <option value="Sunscreen"></option>
+                <option value="Toner"></option>
+                <option value="Oil"></option>
+                <option value="Balm"></option>
+                <option value="Mask"></option>
+                <option value="Body lotion"></option>
+                <option value="Soap"></option>
+                <option value="Set"></option>
+              </datalist>
+            </label>
+            <label class="field" id="field-size">Pack size
+              <input id="p-size" type="text" placeholder="30 ml" />
+              <p class="field-error" id="err-size"></p>
+              <small>Exactly as printed: 30 ml, 100 g, 1 bar.</small>
+            </label>
+            <label class="field" id="field-price">Price in UGX
+              <input id="p-price" type="number" inputmode="numeric" min="0" step="100" placeholder="Leave empty until confirmed" />
+              <p class="field-error" id="err-price"></p>
+              <small>The real price you charge. Whole shillings, no decimals.</small>
+            </label>
+            <label class="field">Selling status
+              <select id="p-status">
+                <option value="draft">Draft — hidden from the shop</option>
+                <option value="published">Published — visible in the shop</option>
+              </select>
+              <small>Publishing is only allowed once every check below passes.</small>
+            </label>
           </div>
+        </div>
+
+        <div class="group">
+          <p class="group-title">Words <span>Facts, not claims</span></p>
+          <label class="field" id="field-summary">One-line summary
+            <input id="p-summary" type="text" maxlength="140" placeholder="Shown on the product card. Keep it factual." />
+            <p class="field-error" id="err-summary"></p>
+            <span class="counter" id="summary-count-wrap"><span id="summary-count">0</span>/120</span>
+          </label>
+          <label class="field" id="field-description">Description
+            <textarea id="p-description" placeholder="What it is, what it is used for, how to use it. No medical claims."></textarea>
+            <p class="field-error" id="err-description"></p>
+            <span class="counter" id="desc-count-wrap"><span id="desc-count">0</span>/40 characters minimum</span>
+          </label>
+        </div>
+
+        <div class="group">
+          <p class="group-title">Photo <span>4:5, cropped and resized automatically</span></p>
           <div class="photo-row">
-            <div class="photo-box" id="photo-box">
-              <span class="ph"><span aria-hidden="true">PS</span>NO PHOTO</span>
-            </div>
+            <div class="photo-box" id="photo-box"></div>
             <div class="photo-actions">
               <label class="field">Choose an image
                 <input id="p-photo" class="file-input" type="file" accept="image/*" />
               </label>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <div class="row">
                 <button class="btn btn-secondary btn-small" id="btn-photo-download" type="button" disabled>Save this photo</button>
                 <button class="btn btn-quiet btn-small" id="btn-photo-clear" type="button" disabled>Remove photo</button>
               </div>
@@ -295,74 +457,101 @@
           </div>
         </div>
 
-        <div class="gate" style="margin-top:14px">
-          <p class="gate-title">Publish checks</p>
-          <label class="toggle">
-            <input id="p-confirmed" type="checkbox" />
-            <span><b>The name, pack size and price are real</b><small>I have checked this against the actual product I sell.</small></span>
-          </label>
-          <label class="toggle">
-            <input id="p-claims" type="checkbox" />
-            <span><b>The wording and claims have been checked</b><small>No cure, treatment, permanent or guaranteed claims.</small></span>
-          </label>
-          <ul class="checks errors" id="gate-errors"></ul>
-          <ul class="checks warns" id="gate-warns"></ul>
-          <p class="pass" id="gate-pass" hidden>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m20 6-11 11-5-5"/></svg>
-            This product passes every check and can be published.
-          </p>
+        <div class="group">
+          <p class="group-title">Publish checks <span>Both must be true before it can go live</span></p>
+          <div class="gate">
+            <fieldset class="toggles">
+              <legend class="sr-only">Owner confirmations</legend>
+              <label class="toggle">
+                <input id="p-confirmed" type="checkbox" />
+                <span><b>The name, pack size and price are real</b><small>You checked them against the actual product.</small></span>
+              </label>
+              <label class="toggle">
+                <input id="p-claims" type="checkbox" />
+                <span><b>The wording and claims have been checked</b><small>You read the label and nothing here promises a cure, a medical result or an approval we do not have.</small></span>
+              </label>
+            </fieldset>
+            <ul class="checks errors" id="gate-errors"></ul>
+            <ul class="checks warns" id="gate-warns"></ul>
+            <p class="pass" id="gate-pass" hidden>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="m4 12 5 5L20 6"/></svg>
+              This product passes every check and can be published.
+            </p>
+          </div>
         </div>
 
-        <div class="preview">
-          <p class="gate-title" style="margin:0">How it will look in the shop</p>
-          <div class="card" id="card-preview">
-            <div class="vis" id="card-vis">PS</div>
-            <div class="body">
-              <div class="meta-row"><span id="card-cat">PRODUCT TYPE</span><span id="card-size">SIZE</span></div>
-              <b id="card-name">Product name</b>
-              <p id="card-summary">Summary appears here.</p>
-              <span class="price" id="card-price">Set price</span>
+        <div class="group">
+          <p class="group-title">How it will look in the shop <span>Live preview</span></p>
+          <div class="preview">
+            <div class="card" id="card-preview">
+              <div class="vis" id="card-vis"><span class="mark">PS</span></div>
+              <div class="body">
+                <div class="meta-row"><span id="card-cat">PRODUCT TYPE</span><span id="card-size">SIZE</span></div>
+                <b id="card-name">Product name</b>
+                <p id="card-summary">Summary appears here.</p>
+                <span class="price" id="card-price">Set price</span>
+              </div>
             </div>
+            <p class="faint" style="font-size:11px;margin:0">This is the real card component the shop renders, so what you approve here is what customers see.</p>
           </div>
         </div>
       </div>
     </section>
   </div>
 
-  <!-- Finish -->
-  <section class="panel" aria-labelledby="finish-title" style="margin-top:16px">
+  <!-- 03 · Finish -->
+  <section class="panel" id="step-finish" aria-labelledby="finish-title">
     <div class="panel-head">
-      <div><p class="kicker">D · FINISH</p><h2 id="finish-title">Send it back</h2></div>
-      <small>Everything stays on this computer until you send the file</small>
-    </div>
-    <div class="grid-2">
-      <div>
-        <p style="color:var(--muted);font-size:12px">Press <b>Download everything</b> (top right) for one ZIP containing:</p>
-        <ul style="color:var(--muted);font-size:12px;line-height:1.9;padding-left:18px;margin:0">
-          <li><code>catalog.data.json</code> — the catalogue</li>
-          <li><code>images/&lt;product-slug&gt;-01.jpg</code> — each photo, pre-cropped and named</li>
-          <li><code>INTEGRATION-NOTES.txt</code> — what you typed below, plus any problems</li>
-          <li><code>whatsapp-catalog.csv</code> — the same products as a feed for your WhatsApp Business catalogue, so you do not type them twice</li>
-        </ul>
+      <div class="title">
+        <span class="step-badge" aria-hidden="true">03</span>
+        <div><h2 id="finish-title">Download and send it back</h2><small>Everything stays on this computer until you send the file</small></div>
       </div>
-      <label class="field">Anything else I should know?
-        <textarea id="notes" class="notes" placeholder="For example: prices change on the 1st, the delivery sentence is still unconfirmed, this photo still needs your approval…"></textarea>
-        <small>Optional. Included in the ZIP so nothing gets lost in chat.</small>
-      </label>
     </div>
-    <div class="export-bar" style="margin-top:14px">
-      <button class="btn btn-primary" id="btn-export-2" type="button">Download everything (ZIP)</button>
-      <button class="btn btn-secondary" id="btn-json" type="button">Download catalogue JSON only</button>
-      <button class="btn btn-secondary" id="btn-csv" type="button">WhatsApp catalogue CSV</button>
+    <div class="finish-grid">
+      <div>
+        <p class="eyebrow">Inside the ZIP</p>
+        <ul class="file-list">
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/></svg><span><code>catalog.data.json</code> — the catalogue itself.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span><code>images/&lt;product-slug&gt;-01.jpg</code> — each photo, already cropped and named.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h12"/></svg><span><code>whatsapp-catalog.csv</code> — the same products as a feed for your WhatsApp Business catalogue, so you do not type them twice.</span></li>
+          <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M8 9h8M8 13h8M8 17h5"/></svg><span><code>INTEGRATION-NOTES.txt</code> — what you typed, plus any problems and your notes.</span></li>
+        </ul>
+
+        <p class="eyebrow" style="margin-top:20px">What happens after you send it</p>
+        <ol class="next-steps">
+          <li>The products, photos and price checks are loaded into the shop and rebuilt.</li>
+          <li>You get a preview link and approve what you see before anything is public.</li>
+          <li>Only then does the catalogue go live on the site and in the WhatsApp catalogue.</li>
+        </ol>
+      </div>
+      <div>
+        <label class="field">Anything else I should know?
+          <textarea id="notes" class="notes" placeholder="For example: prices change on the 1st, the delivery sentence is still unconfirmed, this photo still needs your approval…"></textarea>
+          <small>Optional. Included in the ZIP so nothing gets lost in chat.</small>
+        </label>
+        <div style="display:grid;gap:8px;margin-top:14px">
+          <button class="btn btn-primary btn-block" id="btn-export-2" type="button">Download everything (ZIP)</button>
+          <button class="btn btn-secondary btn-block" id="btn-json" type="button">Catalogue JSON only</button>
+          <button class="btn btn-secondary btn-block" id="btn-csv" type="button">WhatsApp catalogue CSV</button>
+        </div>
+      </div>
+    </div>
+    <div class="export-bar">
       <button class="btn btn-secondary" id="btn-copy" type="button">Copy a summary for chat</button>
       <button class="btn btn-quiet" id="btn-reset" type="button">Start over</button>
     </div>
   </section>
 
   <footer>
-    <p>This builder is a standalone file. Closing the tab is safe — your work is kept in this browser and reloads next time, but the browser is not a backup: download the ZIP when you are done. Photos are cropped to 4:5 and resized to at most 1600 px tall before being included, so the ZIP stays small.</p>
+    <p>This builder is one standalone file. Closing the tab is safe — your work is kept in this browser and reloads next time — but a browser is not a backup: download the ZIP when you are done. Photos are cropped to 4:5 and resized to at most 1600 px tall before being included, so the ZIP stays small enough to send. Keyboard: <b>Ctrl/⌘ + S</b> downloads the ZIP, <b>Alt + A</b> adds a product.</p>
   </footer>
 </main>
+
+<div class="bottombar" role="region" aria-label="Quick actions">
+  <div class="count"><b id="bb-count">No products yet</b><span id="bb-ready">Add one to begin</span></div>
+  <button class="btn btn-secondary btn-small" id="btn-add-2" type="button">Add product</button>
+  <button class="btn btn-primary btn-small" id="btn-export-3" type="button">Download</button>
+</div>
 
 <script>
 (function () {
@@ -395,7 +584,11 @@
     },
     products: [],
     selectedId: null,
-    notes: ''
+    notes: '',
+    // In memory only: which fields a person has already left, so a red border
+    // never appears before they have had a chance to type anything.
+    touched: {},
+    publishAttempts: {}
   };
 
   // Photo binaries live only in memory; metadata (name + path) is persisted.
@@ -589,6 +782,139 @@
     return null;
   }
 
+  /**
+   * Per-field messages, so a problem appears next to the input that causes it
+   * instead of only in a list at the bottom. The publish gate in
+   * validateProduct() stays the authority; this is the same rules, addressed.
+   */
+  function fieldIssues(p) {
+    var issues = {};
+    var name = (p.name || '').trim();
+    if (name.length < 2) issues.name = 'Give the product its real name.';
+    else if (name.length > 70) issues.name = 'Keep the name to 70 characters (it is ' + name.length + ').';
+    if (!(p.category || '').trim()) issues.category = 'Type the product type, for example Serum.';
+    if (!(p.size_label || '').trim()) issues.size_label = 'Enter the pack size exactly as printed, for example 30 ml.';
+    var price = p.price_ugx;
+    if (price === null || price === undefined) issues.price = 'Enter the confirmed price in shillings.';
+    else if (!isFinite(price) || price <= 0) issues.price = 'Price must be a whole number above zero.';
+    else if (Math.round(price) !== price) issues.price = 'Price must be whole shillings, no decimals.';
+    else if (price > MAX_PRICE) issues.price = 'That looks like a typo — check the amount.';
+    var description = (p.description || '').trim();
+    if (description.length < 40) issues.description = 'Add at least 40 characters (' + description.length + ' so far) so customers know what they are buying.';
+    else if (description.length > 1200) issues.description = 'Keep the description to 1200 characters.';
+    if ((p.summary || '').trim().length > 120) issues.summary = 'Keep the summary to 120 characters.';
+    return issues;
+  }
+
+  var FIELD_TARGETS = [
+    { key: 'name', field: 'field-name', input: 'p-name', error: 'err-name' },
+    { key: 'category', field: 'field-category', input: 'p-category', error: 'err-category' },
+    { key: 'size_label', field: 'field-size', input: 'p-size', error: 'err-size' },
+    { key: 'price', field: 'field-price', input: 'p-price', error: 'err-price' },
+    { key: 'description', field: 'field-description', input: 'p-description', error: 'err-description' },
+    { key: 'summary', field: 'field-summary', input: 'p-summary', error: 'err-summary' }
+  ];
+
+  /** The pill beside the product title: how close this product is to publishable. */
+  function renderReadiness(p) {
+    var readiness = el('readiness');
+    var readinessText = el('readiness-text');
+    if (!readiness || !readinessText) return;
+    if (!p) {
+      readiness.className = 'readiness';
+      readinessText.textContent = 'No product';
+      return;
+    }
+    var done = completeness(p);
+    readiness.className = 'readiness' + (done.ready ? ' is-ready' : '');
+    readinessText.textContent = done.ready
+      ? (p.status === 'published' ? 'Published' : 'Ready — can publish')
+      : done.done + ' of ' + done.total + ' done';
+  }
+
+  /** A field is only marked once the person has left it, or tried to publish. */
+  function renderFieldIssues(p) {
+    var issues = fieldIssues(p);
+    FIELD_TARGETS.forEach(function (target) {
+      var wrapper = el(target.field);
+      var input = el(target.input);
+      var message = el(target.error);
+      if (!wrapper || !input || !message) return;
+      var touched = state.touched[p.id + ':' + target.key] === true || state.publishAttempts[p.id] === true;
+      var invalid = Boolean(issues[target.key]) && touched;
+      wrapper.setAttribute('data-invalid', invalid ? 'true' : 'false');
+      input.setAttribute('aria-invalid', invalid ? 'true' : 'false');
+      message.textContent = invalid ? issues[target.key] : '';
+    });
+    var desc = el('desc-count');
+    var descWrap = el('desc-count-wrap');
+    if (desc && descWrap) {
+      var length = (p.description || '').trim().length;
+      descWrap.className = 'counter' + (length >= 40 && length <= 1200 ? ' at-target' : length > 1200 ? ' over' : '');
+    }
+    var sum = el('summary-count');
+    var sumWrap = el('summary-count-wrap');
+    if (sum && sumWrap) {
+      var summaryLength = (p.summary || '').trim().length;
+      sumWrap.className = 'counter' + (summaryLength > 120 ? ' over' : summaryLength > 0 ? ' at-target' : '');
+    }
+  }
+
+  /** How much of a product is finished: 6 details, a photo decision, 2 confirmations. */
+  function completeness(p) {
+    var steps = [
+      (p.name || '').trim().length >= 2,
+      (p.category || '').trim().length > 0,
+      (p.size_label || '').trim().length > 0,
+      p.price_ugx !== null && p.price_ugx > 0,
+      (p.description || '').trim().length >= 40,
+      Boolean(p.image_path),
+      p.owner_confirmed === true,
+      p.claims_checked === true
+    ];
+    var done = steps.filter(Boolean).length;
+    return { done: done, total: steps.length, ready: validateProduct(p).errors.length === 0 };
+  }
+
+  /** Progress strip, counts and the mobile action bar. */
+  function renderChrome() {
+    var published = 0, blocked = 0, photos = 0, ready = 0;
+    state.products.forEach(function (p) {
+      var gate = validateProduct(p);
+      if (p.status === 'published') published += 1;
+      if (gate.errors.length) blocked += 1;
+      if (p.image_path) photos += 1;
+      if (!gate.errors.length) ready += 1;
+    });
+
+    var shopDone = (state.settings.whatsapp_number || '').length >= 9 && Boolean((state.settings.business_name || '').trim());
+    var productsDone = state.products.length > 0;
+    var downloaded = !dirty && state.products.length > 0;
+
+    function paint(prefix, done, current, doneText) {
+      var button = el(prefix + '-btn');
+      var stateLabel = el(prefix + '-state');
+      var num = el(prefix + '-num');
+      if (!button) return;
+      button.className = 'step' + (done ? ' is-done' : current ? ' is-current' : '');
+      if (num) num.textContent = done ? '✓' : String({ 'step-shop': 1, 'step-products': 2, 'step-finish': 3 }[prefix]);
+      if (stateLabel && doneText) stateLabel.textContent = doneText;
+      if (!done && !current) button.setAttribute('aria-disabled', 'false');
+    }
+
+    paint('step-shop', shopDone, !shopDone, shopDone ? 'Done' : 'Start here');
+    paint('step-products', productsDone, shopDone && !productsDone, productsDone ? state.products.length + (state.products.length === 1 ? ' product' : ' products') : 'None yet');
+    paint('step-finish', downloaded, shopDone && productsDone && !downloaded, downloaded ? 'Downloaded' : ready > 0 ? ready + ' ready to send' : 'Not yet');
+
+    var listCount = el('list-count');
+    if (listCount) listCount.textContent = state.products.length ? state.products.length + (state.products.length === 1 ? ' item' : ' items') : 'None yet';
+
+    var bbCount = el('bb-count');
+    var bbReady = el('bb-ready');
+    if (bbCount) bbCount.textContent = state.products.length ? state.products.length + (state.products.length === 1 ? ' product' : ' products') : 'No products yet';
+    if (bbReady) bbReady.textContent = state.products.length ? ready + ' ready · ' + blocked + ' blocked' : 'Add one to begin';
+  }
+
   function renderStats() {
     var published = 0, blocked = 0, withPhoto = 0;
     state.products.forEach(function (p) {
@@ -600,6 +926,7 @@
     el('stat-published').textContent = String(published);
     el('stat-photos').textContent = String(withPhoto);
     el('stat-blocked').textContent = String(blocked);
+    renderChrome();
   }
 
   function renderList() {
@@ -607,22 +934,34 @@
     list.innerHTML = '';
     state.products.forEach(function (p) {
       var gate = validateProduct(p);
+      var done = completeness(p);
+      var photo = photos[p.id];
+      var thumb = photo && photo.dataUrl
+        ? '<img alt="" src="' + photo.dataUrl + '" />'
+        : p.image_path ? '<span class="empty-mark" aria-hidden="true">PS</span>' : '<span class="empty-mark" aria-hidden="true">+</span>';
+      var chip = p.status === 'published'
+        ? '<span class="chip pub">Live</span>'
+        : gate.errors.length ? '<span class="chip blocked">' + gate.errors.length + '</span>' : '<span class="chip">Draft</span>';
+
       var li = document.createElement('li');
       var button = document.createElement('button');
       button.type = 'button';
       button.className = 'item';
       button.setAttribute('aria-current', p.id === state.selectedId ? 'true' : 'false');
-      var chips = '<span class="chip ' + (p.status === 'published' ? 'pub' : '') + '">' + (p.status === 'published' ? 'Published' : 'Draft') + '</span>';
-      if (gate.errors.length) chips += '<span class="chip blocked">' + gate.errors.length + ' blocked</span>';
+      button.setAttribute('aria-label', (p.name || 'Untitled product') + ' — ' + done.done + ' of ' + done.total + ' details done' + (p.status === 'published' ? ', published' : ''));
       button.innerHTML =
-        '<span class="name"><b>' + escapeHtml(p.name || 'Untitled product') + '</b>' +
-        '<small>' + escapeHtml([p.category, p.size_label].filter(Boolean).join(' · ') || 'Type and size not set') + '</small></span>' +
-        '<span class="right">' + chips + '</span>';
+        '<span class="thumb">' + thumb + '</span>' +
+        '<span class="item-body">' +
+          '<span class="item-top"><span class="item-name">' + escapeHtml(p.name || 'Untitled product') + '</span>' + chip + '</span>' +
+          '<span class="item-meta">' + escapeHtml([p.category, p.size_label].filter(Boolean).join(' · ') || 'No type or size yet') + '</span>' +
+          '<span class="meter' + (done.ready ? ' is-done' : '') + '" aria-hidden="true"><i style="width:' + Math.round((done.done / done.total) * 100) + '%"></i></span>' +
+        '</span>';
       button.addEventListener('click', function () { selectProduct(p.id); });
       li.appendChild(button);
       list.appendChild(li);
     });
     el('list-empty').hidden = state.products.length > 0;
+    renderChrome();
   }
 
   function renderEditor() {
@@ -632,7 +971,8 @@
     el('btn-delete').hidden = !p;
     el('btn-duplicate').hidden = !p;
     el('editor-title').textContent = p ? (p.name || 'Untitled product') : 'Nothing selected';
-    if (!p) return;
+    renderReadiness(p);
+    if (!p) { renderChrome(); return; }
 
     el('p-name').value = p.name;
     el('p-slug').value = p.slug;
@@ -679,6 +1019,7 @@
     if (p.status === 'published' && gate.errors.length > 0) {
       statusSelect.value = 'draft';
       p.status = 'draft';
+      state.publishAttempts[p.id] = true;
       setStatus('Set back to draft: this product no longer passes the checks. Fix the items below, then publish again.', 'warn');
     }
 
@@ -719,6 +1060,9 @@
     el('card-name').textContent = p.name || 'Product name';
     el('card-summary').textContent = p.summary || p.description || 'Summary appears here.';
     el('card-price').textContent = formatUGX(p.price_ugx);
+
+    renderFieldIssues(p);
+    renderReadiness(p);
 
     renderStats();
     renderList();
@@ -801,12 +1145,15 @@
   }
 
   function onStatusChange(value) {
+    var current = selected();
+    if (current && value === 'published') state.publishAttempts[current.id] = true;
     var p = selected();
     if (!p) return;
     if (value === 'published') {
       var gate = validateProduct(p);
       if (gate.errors.length) {
         el('p-status').value = 'draft';
+        renderFieldIssues(p);
         setStatus('Cannot publish yet: ' + gate.errors[0] + ' Fix the remaining checks first.', 'bad');
         return;
       }
@@ -1305,6 +1652,47 @@
   el('s-location').addEventListener('input', function (e) { state.settings.location = e.target.value; persist(); });
   el('s-delivery').addEventListener('input', function (e) { state.settings.delivery_summary = e.target.value; persist(); });
   el('notes').addEventListener('input', function (e) { state.notes = e.target.value; persist(); });
+
+  // Mark a field as visited when it loses focus, so red borders only appear
+  // after someone has had a chance to fill it in.
+  [['p-name','name'],['p-category','category'],['p-size','size_label'],['p-price','price'],['p-description','description'],['p-summary','summary']].forEach(function (pair) {
+    var input = el(pair[0]);
+    if (!input) return;
+    input.addEventListener('blur', function () {
+      var p = selected();
+      if (!p) return;
+      // Leaving a field empty is only flagged once the person has typed in it,
+      // or once they have tried to publish. Scanning the form stays calm.
+      if (String(input.value || '').trim()) state.touched[p.id + ':' + pair[1]] = true;
+      renderFieldIssues(p);
+    });
+  });
+
+  // Step strip: jump to the section it describes.
+  Array.prototype.forEach.call(document.querySelectorAll('[data-goto]'), function (button) {
+    button.addEventListener('click', function () {
+      var target = el(button.getAttribute('data-goto'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  el('btn-add-2').addEventListener('click', addProduct);
+  el('btn-export-3').addEventListener('click', function () { exportZip(); });
+
+  // Ctrl/Cmd+S downloads the ZIP instead of asking to save the page; Alt+A adds
+  // a product. Both are documented in the finish panel.
+  document.addEventListener('keydown', function (event) {
+    var key = (event.key || '').toLowerCase();
+    if ((event.metaKey || event.ctrlKey) && key === 's') {
+      event.preventDefault();
+      exportZip();
+      return;
+    }
+    if (event.altKey && key === 'a') {
+      event.preventDefault();
+      addProduct();
+    }
+  });
 
   el('btn-add').addEventListener('click', addProduct);
   el('btn-delete').addEventListener('click', deleteSelected);
