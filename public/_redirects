@@ -1,0 +1,4 @@
+# Cloudflare Pages is a static host: it does not fall back to index.html on its own.
+# The app uses client-side routing (BrowserRouter), so every unmatched path must
+# return the built app shell instead of a 404. Must live in the build output root.
+/*    /index.html    200

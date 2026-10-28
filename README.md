@@ -4,7 +4,7 @@ A customer-facing product catalogue with WhatsApp handoff, plus a private owner 
 
 ## Project status — production rebuild in progress
 
-This repository is a rebuild, **not yet production-ready or deployed**. The app has first-pass storefront/owner screens, a reviewed-but-unapplied database migration, automated checks and a manual owner-bootstrap path. No live Supabase project has been configured, no production data has been imported, and no Cloudflare deployment has been made. The shop therefore shows a truthful setup message rather than invented products, prices or stock.
+This repository is a rebuild, **not yet production-ready**. A Cloudflare Pages project serves it, but only as a staging preview: no live Supabase project is connected, so the storefront truthfully reports that it is not set up. The app has first-pass storefront/owner screens, a reviewed-but-unapplied database migration, automated checks and a manual owner-bootstrap path. No live Supabase project has been configured and no production data has been imported, so the shop shows a truthful setup message rather than invented products, prices or stock.
 
 The earlier offline app and its JSON backup are migration sources and must remain untouched until a reviewed migration, reconciliation and explicit owner acceptance are complete.
 
@@ -64,4 +64,24 @@ npm audit --audit-level=low
 
 ## Cloudflare / GitHub
 
-`wrangler.jsonc` and the Cloudflare Vite integration are prepared for Worker Static Assets/SPA routing. GitHub CI checks source but there is intentionally no deploy workflow yet. Deployment requires repo-scoped GitHub authorization, a configured Cloudflare Worker Build, domain/origin setup, and reviewed Supabase environment variables. No credentials belong in this repository. See `SECURITY.md` for the current threat boundaries and release blockers.
+GitHub CI (`.github/workflows/quality.yml`) checks every push to `main` and every pull request; it does not deploy.
+
+### Cloudflare Pages
+
+The site is hosted on Cloudflare Pages from `joelwanyama/purity-skin` with **`deploy` as the production branch**: every push to `deploy` builds and publishes to the production URL, and pushes to other branches produce preview deployments. Cloudflare reports each attempt as a `Cloudflare Pages` check run on the commit.
+
+The project's build settings must be:
+
+| Setting | Value |
+| --- | --- |
+| Framework preset | Vite |
+| Build command | `npm run build` |
+| Build output directory | `dist` |
+| Root directory | `/` (repository root) |
+| Node version | `22` (pinned by `.nvmrc`) |
+
+If the build command is empty or the output directory is left at the repository root, Cloudflare publishes the **unbuilt source** — the page loads `index.html`, whose `<script src="/src/main.tsx">` is served as raw TypeScript, and the app stays blank. That was the state of the first deploy.
+
+`public/_redirects` provides the SPA fallback (`/* /index.html 200`) that Cloudflare Pages needs for client-side routes such as `/owner`, and `public/_headers` sets cache rules (fingerprinted assets immutable, `sw.js` uncached). Both files must be in the build output, which is why they live in `public/`.
+
+Environment variables: only browser-safe `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` belong in the Pages build settings, and only once a Supabase project exists. A service-role key must never be added there or in any `VITE_` variable. No credentials belong in this repository. See `SECURITY.md` for the current threat boundaries and release blockers.
