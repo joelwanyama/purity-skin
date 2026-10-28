@@ -1,0 +1,13 @@
+// Configuration used by the Cloudflare Vite plugin for local development and the
+// client build. It stays a Workers static-assets config with SPA fallback.
+//
+// wrangler.jsonc (the Pages config with pages_build_output_dir) is what Cloudflare
+// Pages reads at deploy time, and it must stay free of Workers-only keys.
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "purity-skin-dev",
+  "compatibility_date": "2026-10-28",
+  "assets": {
+    "not_found_handling": "single-page-application"
+  }
+}
