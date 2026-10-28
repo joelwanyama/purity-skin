@@ -327,6 +327,6 @@ export function Studio() {
       </div>
     </section>
 
-    <p className="studio-foot">Committed catalogue: {committedCatalog().products.length} products · documentation in <code className="inline-code">docs/CATALOGUE.md</code> · photo specification in <code className="inline-code">docs/ASSETS.md</code> · <Link to="/shop">view the public shop</Link></p>
+    <p className="studio-foot">Prefer a standalone file? Download <a href="/downloads/purity-skin-catalogue-builder.html" download>the offline catalogue builder</a> — same fields, exports a ZIP with the JSON and photos. Committed catalogue: {committedCatalog().products.length} products · documentation in <code className="inline-code">docs/CATALOGUE.md</code> · photo specification in <code className="inline-code">docs/ASSETS.md</code> · <Link to="/shop">view the public shop</Link></p>
   </div>
 }

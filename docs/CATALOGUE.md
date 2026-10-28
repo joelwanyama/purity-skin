@@ -4,6 +4,10 @@ The shop's content is a single committed JSON file with an editor that runs in t
 
 > **This is not the protected owner workspace.** `/studio/catalogue` is a local drafting tool: anyone who opens it edits *their own browser copy* and can download a JSON file. Real owner access, product editing and stock arrive with the Supabase step, where accounts are invited and verified. Until then, publishing requires a Git commit by the repository owner.
 
+## The standalone builder (for the shop owner)
+
+`PURITY_SKIN_Catalogue_Builder.html` is a single offline file that collects the catalogue and exports a ZIP (JSON + pre-cropped, correctly named photos + handover notes). It is the easier path when someone other than a developer is filling in products: they open it in Chrome, work offline, and send back one file. Details and integration steps: `docs/BUILDER.md`.
+
 ## Files
 
 | Path | Purpose |

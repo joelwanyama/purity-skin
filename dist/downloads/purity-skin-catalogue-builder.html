@@ -1,0 +1,1346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PURITY SKIN · Catalogue Builder</title>
+<style>
+  :root{
+    color-scheme: dark;
+    --canvas:#141018; --surface:#1e1826; --raised:#261d31; --line:#3a2f47;
+    --ink:#f4eef8; --muted:#b7a8c7; --accent:#e88bb0; --accent-ink:#2a1020;
+    --accent-soft:#f7c9dd; --gold:#ffd479; --ok:#8fd694; --bad:#ff8f8f; --warn:#ffd479;
+    --radius:12px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-padding-top:80px}
+  body{margin:0;min-width:320px;background:var(--canvas);color:var(--ink);font:14px/1.5 var(--font);-webkit-font-smoothing:antialiased}
+  h1,h2,h3,p{margin-top:0}
+  h1{font-size:26px;line-height:1.15;letter-spacing:-.03em;margin-bottom:8px}
+  h2{font-size:16px;line-height:1.3;letter-spacing:-.01em;margin-bottom:0}
+  h3{font-size:13px;margin-bottom:0}
+  p{line-height:1.6}
+  a{color:var(--accent-soft)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  ::selection{background:var(--accent);color:var(--accent-ink)}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 clamp(14px,4vw,40px)}
+
+  header.top{position:sticky;top:0;z-index:20;background:rgba(20,16,24,.94);border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+  .top-inner{display:flex;align-items:center;gap:14px;min-height:66px;flex-wrap:wrap;padding:10px 0}
+  .brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+  .mono-badge{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--accent);border-radius:var(--radius);color:var(--accent-soft);font:700 13px var(--mono);letter-spacing:-.06em}
+  .brand strong{display:block;font-size:12px;letter-spacing:.1em}
+  .brand small{display:block;margin-top:2px;font:500 9px var(--mono);letter-spacing:.08em;color:var(--muted)}
+
+  .btn{min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:8px 13px;border:1px solid transparent;border-radius:var(--radius);background:transparent;color:var(--ink);font:600 12px var(--font);cursor:pointer;transition:background-color .14s ease-out,border-color .14s ease-out,transform .14s ease-out}
+  .btn:hover{transform:translateY(-1px)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .btn-primary{background:var(--accent);color:var(--accent-ink)}
+  .btn-primary:hover:not(:disabled){background:var(--accent-soft)}
+  .btn-secondary{background:var(--raised);border-color:var(--line)}
+  .btn-secondary:hover:not(:disabled){border-color:var(--accent);color:var(--accent-soft)}
+  .btn-quiet{color:var(--accent-soft);border-color:transparent;background:transparent}
+  .btn-danger{background:#38212b;border-color:#62414e;color:var(--bad)}
+  .btn-small{min-height:32px;padding:5px 10px;font-size:11px}
+
+  main{padding:26px 0 80px}
+  .intro{margin-bottom:22px;max-width:760px}
+  .intro p{color:var(--muted);margin-bottom:10px}
+  .kicker{margin:0 0 7px;color:var(--accent);font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .notice{display:flex;gap:11px;align-items:flex-start;padding:13px 15px;border:1px solid var(--line);border-radius:var(--radius);background:var(--raised);font-size:12px;color:var(--muted);margin-bottom:20px}
+  .notice b{color:var(--ink)}
+  .notice svg{flex:none;margin-top:1px;color:var(--accent-soft)}
+  .status{margin:0 0 16px;padding:10px 13px;border:1px solid var(--line);border-radius:var(--radius);font-size:12px;background:var(--surface)}
+  .status.ok{border-color:#3f5a44;background:#1b2620;color:#bfe3c5}
+  .status.warn{border-color:#5c4a2e;background:#251f16;color:#f0d7a8}
+  .status.bad{border-color:#62414e;background:#291c24;color:#f1bdc3}
+  .status:empty{display:none}
+
+  .panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:18px;margin-bottom:16px}
+  .panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .panel-head small{color:var(--muted);font-size:11px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+
+  .field{display:grid;gap:6px;font-size:12px;font-weight:600;color:var(--muted);min-width:0}
+  .field input,.field select,.field textarea{width:100%;min-height:42px;padding:9px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);color:var(--ink);font:400 14px var(--font);outline:none}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px #e88bb033}
+  .field textarea{min-height:96px;resize:vertical;line-height:1.55}
+  .field small{font-size:11px;font-weight:400;color:var(--muted)}
+  .field .counter{font:500 10px var(--mono);color:var(--muted)}
+
+  .cols{display:grid;grid-template-columns:300px minmax(0,1fr);gap:16px;align-items:start}
+  .list{margin:0;padding:0;list-style:none;display:grid;gap:7px;max-height:min(64vh,620px);overflow:auto}
+  .list li{display:block}
+  .list button.item{width:100%;display:flex;justify-content:space-between;gap:9px;align-items:center;padding:10px 11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);color:var(--ink);text-align:left;cursor:pointer}
+  .list button.item[aria-current="true"]{border-color:var(--accent);background:#241b2c}
+  .list .name{display:grid;gap:2px;min-width:0}
+  .list .name b{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .list .name small{color:var(--muted);font-size:10px}
+  .list .right{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{padding:2px 7px;border:1px solid var(--line);border-radius:999px;font:600 9px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);white-space:nowrap}
+  .chip.pub{border-color:#3f5a44;background:#1b2620;color:#bfe3c5}
+  .chip.blocked{border-color:#62414e;background:#291c24;color:var(--bad)}
+
+  .gate{display:grid;gap:9px;padding:14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--raised);margin-top:2px}
+  .gate-title{margin:0;color:var(--accent);font:600 10px var(--mono);letter-spacing:.1em;text-transform:uppercase}
+  .checks{display:grid;gap:7px;margin:0;padding:0;list-style:none;font-size:12px}
+  .checks li{display:flex;gap:7px;align-items:flex-start;line-height:1.5}
+  .checks svg{flex:none;margin-top:2px}
+  .checks.errors li{color:#f1bdc3}
+  .checks.warns li{color:#f0d7a8}
+  .pass{display:flex;align-items:center;gap:7px;margin:0;color:#bfe3c5;font-size:12px}
+  .toggle{display:flex;gap:10px;align-items:flex-start;padding:11px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas)}
+  .toggle input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent);flex:none}
+  .toggle span{display:grid;gap:2px}
+  .toggle b{font-size:12px;color:var(--ink)}
+  .toggle small{font-size:11px;color:var(--muted)}
+
+  .photo-row{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;align-items:start}
+  .photo-box{position:relative;aspect-ratio:4/5;border:1px dashed #4a3a58;border-radius:var(--radius);background:var(--canvas);display:grid;place-items:center;overflow:hidden}
+  .photo-box img{width:100%;height:100%;object-fit:cover;display:block}
+  .photo-box .ph{display:grid;justify-items:center;gap:6px;color:#7d6b8c;font:600 9px var(--mono);letter-spacing:.12em}
+  .photo-box .ph span{font-size:26px;letter-spacing:-.1em;color:#6d5a7d}
+  .photo-actions{display:grid;gap:9px;align-content:start}
+  .file-input{display:block;width:100%;padding:8px;border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);color:var(--muted);font-size:12px}
+  .meta{font:500 10px var(--mono);color:var(--muted);letter-spacing:.04em;line-height:1.8}
+
+  .preview{display:grid;gap:8px;margin-top:4px}
+  .card{border:1px solid var(--line);border-radius:var(--radius);background:var(--canvas);overflow:hidden;max-width:260px}
+  .card .vis{aspect-ratio:4/5;min-height:120px;display:grid;place-items:center;background:var(--surface);border-bottom:1px solid var(--line);color:#6d5a7d;font:700 30px var(--mono);letter-spacing:-.1em;overflow:hidden}
+  .card .vis img{width:100%;height:100%;object-fit:cover;display:block;border-radius:8px 8px 0 0}
+  .card .body{display:grid;gap:5px;padding:11px 12px 13px}
+  .card .meta-row{display:flex;justify-content:space-between;color:var(--muted);font:600 9px var(--mono);letter-spacing:.08em;text-transform:uppercase}
+  .card .body b{font-size:13px}
+  .card .body p{margin:0;color:var(--muted);font-size:11px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card .price{color:var(--gold);font-size:12px;font-weight:700}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+  .stats div{padding:12px 14px;border:1px solid var(--line);border-radius:var(--radius);background:var(--surface)}
+  .stats strong{display:block;font-size:20px;color:var(--accent-soft);font-variant-numeric:tabular-nums}
+  .stats span{color:var(--muted);font-size:10px}
+  .empty{padding:22px;text-align:center;color:var(--muted);font-size:12px;border:1px dashed var(--line);border-radius:var(--radius)}
+  .export-bar{display:flex;gap:9px;flex-wrap:wrap}
+  code{font:500 11px var(--mono);color:var(--accent-soft);background:var(--raised);padding:1px 5px;border-radius:5px;word-break:break-word}
+  textarea.notes{min-height:80px}
+  footer{padding:20px 0 40px;color:var(--muted);font-size:11px;line-height:1.8}
+
+  @media (max-width:600px){
+    .top-inner{gap:8px;padding:8px 0}
+    .brand small{display:none}
+    .brand strong{font-size:11px}
+    .top-inner .btn{padding:7px 10px;font-size:11px;min-height:36px}
+  }
+  @media (max-width:900px){
+    .cols{grid-template-columns:1fr}
+    .list{max-height:none}
+    .grid-2,.grid-3{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .photo-row{grid-template-columns:110px minmax(0,1fr)}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="brand">
+      <span class="mono-badge" aria-hidden="true">PS</span>
+      <span><strong>PURITY SKIN</strong><small>CATALOGUE BUILDER</small></span>
+    </div>
+    <button class="btn btn-secondary" id="btn-import" type="button">Import a file</button>
+    <input id="import-input" class="sr-only" type="file" accept="application/json,.json,.zip,application/zip" aria-label="Import a previously exported catalogue JSON" />
+    <button class="btn btn-primary" id="btn-export" type="button">Download everything</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <p class="kicker">STEP ONE OF THE CATALOGUE</p>
+    <h1>Fill this in, download it, send it back.</h1>
+    <p>This page runs entirely in your browser. Nothing is uploaded anywhere and it does not need internet. Enter your real products, attach the photos you want used, then press <b>Download everything</b> — you get one ZIP file containing the catalogue JSON and every photo, already named correctly. Send that ZIP over and it can be dropped straight into the shop.</p>
+  </div>
+
+  <div class="notice">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+    <div><b>Two rules that keep the shop honest:</b> only publish a product when the price is the real one you charge and the photo is one you own. Anything you leave unconfirmed stays a draft and never appears on the public site.</div>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <div class="stats" aria-hidden="true">
+    <div><strong id="stat-products">0</strong><span>products</span></div>
+    <div><strong id="stat-published">0</strong><span>ready to publish</span></div>
+    <div><strong id="stat-photos">0</strong><span>photos attached</span></div>
+    <div><strong id="stat-blocked">0</strong><span>blocked by checks</span></div>
+  </div>
+
+  <!-- Shop details -->
+  <section class="panel" aria-labelledby="shop-title">
+    <div class="panel-head">
+      <div><p class="kicker">A · SHOP DETAILS</p><h2 id="shop-title">How customers reach you</h2></div>
+      <small>Used in the header, footer and every WhatsApp button</small>
+    </div>
+    <div class="grid-2">
+      <label class="field">Business name
+        <input id="s-business" type="text" autocomplete="organization" placeholder="PURITY SKIN" />
+      </label>
+      <label class="field">WhatsApp number
+        <input id="s-whatsapp" type="tel" inputmode="numeric" placeholder="256757377624" />
+        <small>Digits only, with country code. This is the number that must actually answer messages.</small>
+      </label>
+      <label class="field">Location
+        <input id="s-location" type="text" placeholder="Kampala, Uganda" />
+      </label>
+      <label class="field">Delivery summary (optional)
+        <input id="s-delivery" type="text" placeholder="Leave empty until delivery is agreed" />
+        <small>One honest sentence about delivery areas, timing or fees. Empty means the site says it is confirmed on WhatsApp.</small>
+      </label>
+    </div>
+  </section>
+
+  <!-- Products -->
+  <div class="cols">
+    <section class="panel" aria-labelledby="list-title" style="margin-bottom:0">
+      <div class="panel-head">
+        <h2 id="list-title">Products</h2>
+        <button class="btn btn-secondary btn-small" id="btn-add" type="button">Add product</button>
+      </div>
+      <ul class="list" id="product-list"></ul>
+      <p id="list-empty" class="empty">No products yet. Press “Add product” to start with your first real one.</p>
+    </section>
+
+    <section class="panel" aria-labelledby="editor-title" id="editor-panel">
+      <div class="panel-head">
+        <div><p class="kicker">B · PRODUCT DETAILS</p><h2 id="editor-title">Nothing selected</h2></div>
+        <div style="display:flex;gap:7px">
+          <button class="btn btn-secondary btn-small" id="btn-duplicate" type="button" hidden>Duplicate</button>
+          <button class="btn btn-danger btn-small" id="btn-delete" type="button" hidden>Remove</button>
+        </div>
+      </div>
+
+      <p id="editor-empty" class="empty">Add a product, or pick one from the list, to fill in its details.</p>
+
+      <div id="editor-body" hidden>
+        <div class="grid-2">
+          <label class="field">Product name
+            <input id="p-name" type="text" placeholder="Exactly as printed on the pack" />
+            <small id="slug-hint">Link: /shop/…</small>
+          </label>
+          <label class="field">Page link (slug)
+            <input id="p-slug" type="text" placeholder="auto from the name" />
+            <small>Letters, numbers and dashes. Leave it alone unless you need a specific link.</small>
+          </label>
+          <label class="field">Product type
+            <input id="p-category" type="text" list="category-options" placeholder="Serum" />
+            <datalist id="category-options">
+              <option value="Serum"></option><option value="Cleanser"></option><option value="Toner"></option>
+              <option value="Moisturiser"></option><option value="Sunscreen"></option><option value="Soap"></option>
+              <option value="Scrub"></option><option value="Oil"></option><option value="Mask"></option>
+              <option value="Body lotion"></option><option value="Lip care"></option>
+            </datalist>
+          </label>
+          <label class="field">Pack size
+            <input id="p-size" type="text" placeholder="30 ml" />
+            <small>Exactly what the pack says: 30 ml, 120 g, 1 bar.</small>
+          </label>
+          <label class="field">Price in UGX
+            <input id="p-price" type="number" inputmode="numeric" min="0" step="100" placeholder="Leave empty until confirmed" />
+            <small>The real price you charge. Whole shillings, no decimals.</small>
+          </label>
+          <label class="field">Selling status
+            <select id="p-status">
+              <option value="draft">Draft — hidden from the shop</option>
+              <option value="published">Published — visible in the shop</option>
+            </select>
+            <small>Publishing is only allowed once every check below passes.</small>
+          </label>
+        </div>
+
+        <div class="field" style="margin-top:13px">
+          <label for="p-summary">One-line summary</label>
+          <input id="p-summary" type="text" maxlength="120" placeholder="Shown on product cards. Keep it factual." />
+          <span class="counter"><span id="summary-count">0</span>/120</span>
+        </div>
+
+        <div class="field" style="margin-top:13px">
+          <label for="p-description">Description</label>
+          <textarea id="p-description" placeholder="What it is, what it is used for, how to use it. No medical claims."></textarea>
+          <span class="counter"><span id="desc-count">0</span>/40 characters minimum</span>
+        </div>
+
+        <div class="panel" style="background:var(--raised);margin:14px 0 0">
+          <div class="panel-head" style="margin-bottom:12px">
+            <div><p class="kicker">C · PHOTO</p><h3>Product photo</h3></div>
+            <small>4:5 portrait, cropped automatically</small>
+          </div>
+          <div class="photo-row">
+            <div class="photo-box" id="photo-box">
+              <span class="ph"><span aria-hidden="true">PS</span>NO PHOTO</span>
+            </div>
+            <div class="photo-actions">
+              <label class="field">Choose an image
+                <input id="p-photo" class="file-input" type="file" accept="image/*" />
+              </label>
+              <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <button class="btn btn-secondary btn-small" id="btn-photo-download" type="button" disabled>Save this photo</button>
+                <button class="btn btn-quiet btn-small" id="btn-photo-clear" type="button" disabled>Remove photo</button>
+              </div>
+              <p class="meta" id="photo-meta">No photo attached. The shop shows a designed photo slot instead of a wrong picture.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="gate" style="margin-top:14px">
+          <p class="gate-title">Publish checks</p>
+          <label class="toggle">
+            <input id="p-confirmed" type="checkbox" />
+            <span><b>The name, pack size and price are real</b><small>I have checked this against the actual product I sell.</small></span>
+          </label>
+          <label class="toggle">
+            <input id="p-claims" type="checkbox" />
+            <span><b>The wording and claims have been checked</b><small>No cure, treatment, permanent or guaranteed claims.</small></span>
+          </label>
+          <ul class="checks errors" id="gate-errors"></ul>
+          <ul class="checks warns" id="gate-warns"></ul>
+          <p class="pass" id="gate-pass" hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="m20 6-11 11-5-5"/></svg>
+            This product passes every check and can be published.
+          </p>
+        </div>
+
+        <div class="preview">
+          <p class="gate-title" style="margin:0">How it will look in the shop</p>
+          <div class="card" id="card-preview">
+            <div class="vis" id="card-vis">PS</div>
+            <div class="body">
+              <div class="meta-row"><span id="card-cat">PRODUCT TYPE</span><span id="card-size">SIZE</span></div>
+              <b id="card-name">Product name</b>
+              <p id="card-summary">Summary appears here.</p>
+              <span class="price" id="card-price">Set price</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Finish -->
+  <section class="panel" aria-labelledby="finish-title" style="margin-top:16px">
+    <div class="panel-head">
+      <div><p class="kicker">D · FINISH</p><h2 id="finish-title">Send it back</h2></div>
+      <small>Everything stays on this computer until you send the file</small>
+    </div>
+    <div class="grid-2">
+      <div>
+        <p style="color:var(--muted);font-size:12px">Press <b>Download everything</b> (top right) for one ZIP containing:</p>
+        <ul style="color:var(--muted);font-size:12px;line-height:1.9;padding-left:18px;margin:0">
+          <li><code>catalog.data.json</code> — the catalogue</li>
+          <li><code>images/&lt;product-slug&gt;-01.jpg</code> — each photo, pre-cropped and named</li>
+          <li><code>INTEGRATION-NOTES.txt</code> — what you typed below, plus any problems</li>
+        </ul>
+      </div>
+      <label class="field">Anything else I should know?
+        <textarea id="notes" class="notes" placeholder="For example: prices change on the 1st, the delivery sentence is still unconfirmed, this photo still needs your approval…"></textarea>
+        <small>Optional. Included in the ZIP so nothing gets lost in chat.</small>
+      </label>
+    </div>
+    <div class="export-bar" style="margin-top:14px">
+      <button class="btn btn-primary" id="btn-export-2" type="button">Download everything (ZIP)</button>
+      <button class="btn btn-secondary" id="btn-json" type="button">Download catalogue JSON only</button>
+      <button class="btn btn-secondary" id="btn-copy" type="button">Copy a summary for chat</button>
+      <button class="btn btn-quiet" id="btn-reset" type="button">Start over</button>
+    </div>
+  </section>
+
+  <footer>
+    <p>This builder is a standalone file. Closing the tab is safe — your work is kept in this browser and reloads next time, but the browser is not a backup: download the ZIP when you are done. Photos are cropped to 4:5 and resized to at most 1600 px tall before being included, so the ZIP stays small.</p>
+  </footer>
+</main>
+
+<script>
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'purity.catalogue.builder.v1';
+  var MAX_PRICE = 100000000;
+  var IMAGE_DIR = '/images/products/';
+  var CATEGORIES_FALLBACK = 'PURITY SKIN';
+
+  var CLAIM_PATTERNS = [
+    [/\bcures?\b/i, '"cure" claims need documented evidence'],
+    [/\bheals?\b/i, '"heal" claims are medical claims'],
+    [/\btreats?\b/i, '"treat" claims are medical claims'],
+    [/\bpermanent(ly)?\b/i, '"permanent" is an unprovable claim'],
+    [/\bguarantee[ds]?\b/i, 'guarantees need a stated, honoured policy'],
+    [/\b100\s?%/i, '"100%" claims need proof'],
+    [/\bdermatologist[- ](approved|tested)\b/i, 'clinical endorsement needs documentation'],
+    [/\b(fda|who|nbs)\b/i, 'regulator references need documentation'],
+    [/\bwhitens?\b|\bbleach/i, 'skin-lightening wording is regulated and needs review']
+  ];
+
+  var state = {
+    settings: {
+      business_name: 'PURITY SKIN',
+      whatsapp_number: '',
+      location: 'Kampala, Uganda',
+      delivery_summary: '',
+      updated_at: ''
+    },
+    products: [],
+    selectedId: null,
+    notes: ''
+  };
+
+  // Photo binaries live only in memory; metadata (name + path) is persisted.
+  var photos = {};
+  var slugLocked = {};
+  var idCounter = 0;
+  // True when the catalogue has changed since the last successful download.
+  var dirty = false;
+
+  var el = function (id) { return document.getElementById(id); };
+
+  /* ---------------- helpers ---------------- */
+
+  function nowIso() { return new Date().toISOString(); }
+
+  function newId() {
+    idCounter += 1;
+    return 'local-' + Date.now().toString(36) + '-' + idCounter.toString(36);
+  }
+
+  function slugify(value) {
+    return String(value || '')
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 60);
+  }
+
+  function uniqueSlug(base, taken) {
+    var root = slugify(base) || 'product';
+    var used = {};
+    (taken || []).forEach(function (s) { used[s] = true; });
+    if (!used[root]) return root;
+    var i = 2;
+    while (used[root + '-' + i]) i += 1;
+    return root + '-' + i;
+  }
+
+  function takenSlugs(exceptId) {
+    return state.products.filter(function (p) { return p.id !== exceptId; }).map(function (p) { return p.slug; });
+  }
+
+  function formatUGX(value) {
+    if (value === null || value === undefined || isNaN(value)) return 'Set price';
+    return 'UGX ' + new Intl.NumberFormat('en-UG', { maximumFractionDigits: 0 }).format(value);
+  }
+
+  function setStatus(message, tone) {
+    var box = el('status');
+    box.className = 'status' + (tone ? ' ' + tone : '');
+    box.textContent = message || '';
+  }
+
+  function escapeHtml(text) {
+    return String(text == null ? '' : text)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  /* ---------------- validation (mirrors the app's publish gate) ---------------- */
+
+  function claimWarnings(text) {
+    var found = [];
+    CLAIM_PATTERNS.forEach(function (entry) {
+      if (entry[0].test(text)) found.push(entry[1]);
+    });
+    return found;
+  }
+
+  function isSafeImagePath(value) {
+    if (!value) return false;
+    if (/^https:\/\/[^\s]+$/i.test(value)) return true;
+    return /^\/(?!\/)\S*$/.test(value);
+  }
+
+  function validateProduct(p) {
+    var errors = [];
+    var warnings = [];
+    var name = String(p.name || '').trim();
+    var price = p.price_ugx;
+
+    if (name.length < 2) errors.push('Product name is required.');
+    if (name.length > 70) errors.push('Product name must be 70 characters or fewer.');
+    if (!String(p.category || '').trim()) errors.push('Product type is required (for example: Serum).');
+    if (!String(p.size_label || '').trim()) errors.push('Pack size is required, exactly as printed (for example: 30 ml).');
+
+    if (price === null || price === undefined || (typeof price === 'number' && isNaN(price))) {
+      errors.push('A confirmed price in UGX is required.');
+    } else if (typeof price !== 'number' || !isFinite(price) || Math.round(price) !== price) {
+      errors.push('Price must be a whole number of shillings.');
+    } else if (price <= 0) {
+      errors.push('Price must be greater than zero.');
+    } else if (price > MAX_PRICE) {
+      errors.push('Price looks like a typo; check the amount.');
+    } else if (price < 100) {
+      warnings.push('Price is under UGX 100 — confirm that is not a typo.');
+    }
+
+    var description = String(p.description || '').trim();
+    if (description.length < 40) errors.push('Description needs at least 40 characters so customers know what they are buying.');
+    if (description.length > 1200) errors.push('Description must be 1200 characters or fewer.');
+    if (String(p.summary || '').trim().length > 120) errors.push('Summary must be 120 characters or fewer.');
+    if (!String(p.summary || '').trim()) warnings.push('No short summary — cards will show the description instead.');
+
+    if (!p.owner_confirmed) errors.push('Confirm the name, pack size and price are real before publishing.');
+    if (!p.claims_checked) errors.push('Confirm the wording and claims have been checked before publishing.');
+
+    if (p.image_path && !isSafeImagePath(p.image_path)) {
+      errors.push('Photo path must start with "/" or be a full https:// address.');
+    }
+    if (p.photo_state !== 'ready' || !p.image_path) {
+      warnings.push('No approved photo yet — the shop will show a photo placeholder.');
+    }
+
+    claimWarnings(name + ' ' + (p.summary || '') + ' ' + description).forEach(function (w) { warnings.push(w); });
+    return { errors: errors, warnings: warnings };
+  }
+
+  /* ---------------- persistence ---------------- */
+
+  function markDirty() { dirty = true; }
+
+  function persist() {
+    dirty = true;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        settings: state.settings,
+        products: state.products,
+        selectedId: state.selectedId,
+        notes: state.notes,
+        slugLocked: slugLocked
+      }));
+      return true;
+    } catch (err) {
+      setStatus('This browser will not let the page save automatically (that is normal in some previews). Your work stays on screen — download the ZIP before closing the tab.', 'warn');
+      return false;
+    }
+  }
+
+  function restore() {
+    var raw = null;
+    try { raw = localStorage.getItem(STORAGE_KEY); } catch (err) { raw = null; }
+    if (!raw) return;
+    try {
+      var data = JSON.parse(raw);
+      if (data && typeof data === 'object') {
+        if (data.settings) state.settings = Object.assign(state.settings, data.settings);
+        if (Array.isArray(data.products)) state.products = data.products.map(normalizeProduct);
+        if (data.selectedId) state.selectedId = data.selectedId;
+        if (typeof data.notes === 'string') state.notes = data.notes;
+        if (data.slugLocked) slugLocked = data.slugLocked;
+        setStatus('Restored your previous work from this browser.', 'ok');
+      }
+    } catch (err) {
+      setStatus('Saved data in this browser could not be read, so the form starts empty.', 'warn');
+    }
+  }
+
+  function normalizeProduct(raw) {
+    var p = raw && typeof raw === 'object' ? raw : {};
+    var price = p.price_ugx;
+    if (typeof price === 'string' && price.trim() !== '' && isFinite(Number(price))) price = Math.round(Number(price));
+    if (typeof price !== 'number' || !isFinite(price)) price = null;
+    return {
+      id: typeof p.id === 'string' && p.id ? p.id : newId(),
+      slug: typeof p.slug === 'string' ? p.slug : '',
+      name: typeof p.name === 'string' ? p.name : '',
+      category: typeof p.category === 'string' ? p.category : '',
+      size_label: typeof p.size_label === 'string' ? p.size_label : '',
+      summary: typeof p.summary === 'string' ? p.summary : '',
+      description: typeof p.description === 'string' ? p.description : '',
+      price_ugx: price,
+      image_path: typeof p.image_path === 'string' && p.image_path ? p.image_path : null,
+      photo_state: p.photo_state === 'ready' ? 'ready' : 'pending',
+      status: p.status === 'published' ? 'published' : 'draft',
+      owner_confirmed: p.owner_confirmed === true,
+      claims_checked: p.claims_checked === true,
+      created_at: typeof p.created_at === 'string' ? p.created_at : nowIso(),
+      updated_at: typeof p.updated_at === 'string' ? p.updated_at : nowIso()
+    };
+  }
+
+  /* ---------------- rendering ---------------- */
+
+  function selected() {
+    for (var i = 0; i < state.products.length; i += 1) {
+      if (state.products[i].id === state.selectedId) return state.products[i];
+    }
+    return null;
+  }
+
+  function renderStats() {
+    var published = 0, blocked = 0, withPhoto = 0;
+    state.products.forEach(function (p) {
+      if (p.status === 'published') published += 1;
+      if (validateProduct(p).errors.length > 0) blocked += 1;
+      if (p.photo_state === 'ready' && p.image_path) withPhoto += 1;
+    });
+    el('stat-products').textContent = String(state.products.length);
+    el('stat-published').textContent = String(published);
+    el('stat-photos').textContent = String(withPhoto);
+    el('stat-blocked').textContent = String(blocked);
+  }
+
+  function renderList() {
+    var list = el('product-list');
+    list.innerHTML = '';
+    state.products.forEach(function (p) {
+      var gate = validateProduct(p);
+      var li = document.createElement('li');
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'item';
+      button.setAttribute('aria-current', p.id === state.selectedId ? 'true' : 'false');
+      var chips = '<span class="chip ' + (p.status === 'published' ? 'pub' : '') + '">' + (p.status === 'published' ? 'Published' : 'Draft') + '</span>';
+      if (gate.errors.length) chips += '<span class="chip blocked">' + gate.errors.length + ' blocked</span>';
+      button.innerHTML =
+        '<span class="name"><b>' + escapeHtml(p.name || 'Untitled product') + '</b>' +
+        '<small>' + escapeHtml([p.category, p.size_label].filter(Boolean).join(' · ') || 'Type and size not set') + '</small></span>' +
+        '<span class="right">' + chips + '</span>';
+      button.addEventListener('click', function () { selectProduct(p.id); });
+      li.appendChild(button);
+      list.appendChild(li);
+    });
+    el('list-empty').hidden = state.products.length > 0;
+  }
+
+  function renderEditor() {
+    var p = selected();
+    el('editor-empty').hidden = !!p;
+    el('editor-body').hidden = !p;
+    el('btn-delete').hidden = !p;
+    el('btn-duplicate').hidden = !p;
+    el('editor-title').textContent = p ? (p.name || 'Untitled product') : 'Nothing selected';
+    if (!p) return;
+
+    el('p-name').value = p.name;
+    el('p-slug').value = p.slug;
+    el('p-category').value = p.category;
+    el('p-size').value = p.size_label;
+    el('p-price').value = p.price_ugx === null ? '' : String(p.price_ugx);
+    el('p-status').value = p.status;
+    el('p-summary').value = p.summary;
+    el('p-description').value = p.description;
+    el('p-confirmed').checked = p.owner_confirmed;
+    el('p-claims').checked = p.claims_checked;
+    renderDerived();
+  }
+
+  function renderDerived() {
+    var p = selected();
+    if (!p) return;
+
+    var gate = validateProduct(p);
+    var errors = el('gate-errors');
+    var warns = el('gate-warns');
+    errors.innerHTML = '';
+    warns.innerHTML = '';
+    gate.errors.forEach(function (message) {
+      var li = document.createElement('li');
+      li.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/></svg><span>' + escapeHtml(message) + '</span>';
+      errors.appendChild(li);
+    });
+    gate.warnings.forEach(function (message) {
+      var li = document.createElement('li');
+      li.textContent = message;
+      warns.appendChild(li);
+    });
+    el('gate-pass').hidden = gate.errors.length > 0;
+
+    el('summary-count').textContent = String(p.summary.length);
+    el('desc-count').textContent = String(p.description.trim().length);
+    el('slug-hint').textContent = 'Link: /shop/' + (p.slug || '…');
+
+    // Prevent choosing "published" while checks fail.
+    var statusSelect = el('p-status');
+    var publishOption = statusSelect.querySelector('option[value="published"]');
+    publishOption.disabled = gate.errors.length > 0 && p.status !== 'published';
+    if (p.status === 'published' && gate.errors.length > 0) {
+      statusSelect.value = 'draft';
+      p.status = 'draft';
+      setStatus('Set back to draft: this product no longer passes the checks. Fix the items below, then publish again.', 'warn');
+    }
+
+    // Photo state
+    var box = el('photo-box');
+    var photo = photos[p.id];
+    if (photo && photo.dataUrl) {
+      box.innerHTML = '<img alt="Preview of the photo for ' + escapeHtml(p.name || 'this product') + '" src="' + photo.dataUrl + '" />';
+    } else if (p.photo_state === 'ready' && p.image_path) {
+      // The path is recorded but the image file is not loaded in this page (for example
+      // after a reload or an import of a JSON without photos). Never render a broken
+      // image: state the path and offer to attach the file.
+      box.innerHTML = '<span class="ph"><span aria-hidden="true">PS</span>PHOTO ON FILE<small style="letter-spacing:0;font-weight:400">' +
+        escapeHtml(p.image_path.split('/').pop() || '') + '</small></span>';
+    } else {
+      box.innerHTML = '<span class="ph"><span aria-hidden="true">PS</span>NO PHOTO</span>';
+    }
+
+    var meta = el('photo-meta');
+    if (photo) {
+      meta.innerHTML = 'Ready to include as <code>' + escapeHtml(photo.filename) + '</code> · ' + photo.width + '×' + photo.height + ' · ' + Math.round(photo.bytes / 1024) + ' KB.';
+    } else if (p.photo_state === 'ready' && p.image_path) {
+      meta.innerHTML = 'This product already points at <code>' + escapeHtml(p.image_path) + '</code>, but the image file is not loaded in this page. ' +
+        'Choosing an image here adds it to the download; skip it if that file already exists in the shop.';
+    } else {
+      meta.textContent = 'No photo attached. The shop shows a designed photo slot instead of a wrong picture.';
+    }
+    el('btn-photo-download').disabled = !photo;
+    el('btn-photo-clear').disabled = !photo;
+
+    // Card preview
+    var vis = el('card-vis');
+    if (photo && photo.dataUrl) vis.innerHTML = '<img alt="" src="' + photo.dataUrl + '" />';
+    else if (p.photo_state === 'ready' && p.image_path) vis.textContent = 'PS';
+    else vis.textContent = 'PS';
+    el('card-cat').textContent = p.category || CATEGORIES_FALLBACK;
+    el('card-size').textContent = p.size_label || '—';
+    el('card-name').textContent = p.name || 'Product name';
+    el('card-summary').textContent = p.summary || p.description || 'Summary appears here.';
+    el('card-price').textContent = formatUGX(p.price_ugx);
+
+    renderStats();
+    renderList();
+  }
+
+  function selectProduct(id) {
+    state.selectedId = id;
+    persist();
+    renderEditor();
+    renderList();
+  }
+
+  /* ---------------- product actions ---------------- */
+
+  function addProduct() {
+    var p = {
+      id: newId(), slug: '', name: '', category: '', size_label: '', summary: '', description: '',
+      price_ugx: null, image_path: null, photo_state: 'pending', status: 'draft',
+      owner_confirmed: false, claims_checked: false, created_at: nowIso(), updated_at: nowIso()
+    };
+    p.slug = uniqueSlug('product', takenSlugs(p.id));
+    state.products.push(p);
+    state.selectedId = p.id;
+    persist();
+    renderEditor();
+    renderList();
+    el('p-name').focus();
+    setStatus('New draft added. It stays hidden from the shop until every check passes and you set it to published.', 'warn');
+  }
+
+  function updateSelected(patch) {
+    var p = selected();
+    if (!p) return;
+    Object.keys(patch).forEach(function (key) { p[key] = patch[key]; });
+    p.updated_at = nowIso();
+    persist();
+    renderDerived();
+  }
+
+  function onNameInput(value) {
+    var p = selected();
+    if (!p) return;
+    p.name = value;
+    if (!slugLocked[p.id]) {
+      p.slug = uniqueSlug(value || 'product', takenSlugs(p.id));
+      el('p-slug').value = p.slug;
+      var photo = photos[p.id];
+      if (photo) {
+        photo.filename = p.slug + '-01.jpg';
+        p.image_path = IMAGE_DIR + photo.filename;
+      }
+    }
+    p.updated_at = nowIso();
+    persist();
+    el('editor-title').textContent = p.name || 'Untitled product';
+    renderDerived();
+  }
+
+  function onSlugInput(value) {
+    var p = selected();
+    if (!p) return;
+    var clean = slugify(value);
+    p.slug = uniqueSlug(clean || 'product', takenSlugs(p.id));
+    slugLocked[p.id] = clean.length > 0;
+    el('p-slug').value = p.slug;
+    var photo = photos[p.id];
+    if (photo) {
+      photo.filename = p.slug + '-01.jpg';
+      p.image_path = IMAGE_DIR + photo.filename;
+    }
+    p.updated_at = nowIso();
+    persist();
+    renderDerived();
+  }
+
+  function onPriceInput(value) {
+    if (value === '') { updateSelected({ price_ugx: null }); return; }
+    var number = Number(value);
+    updateSelected({ price_ugx: isFinite(number) ? Math.round(number) : null });
+  }
+
+  function onStatusChange(value) {
+    var p = selected();
+    if (!p) return;
+    if (value === 'published') {
+      var gate = validateProduct(p);
+      if (gate.errors.length) {
+        el('p-status').value = 'draft';
+        setStatus('Cannot publish yet: ' + gate.errors[0] + ' Fix the remaining checks first.', 'bad');
+        return;
+      }
+    }
+    updateSelected({ status: value });
+    setStatus(value === 'published' ? 'Published in this catalogue. It will appear in the shop once the file is integrated.' : 'Set to draft. It will not appear in the shop.', value === 'published' ? 'ok' : '');
+  }
+
+  function deleteSelected() {
+    var p = selected();
+    if (!p) return;
+    if (!window.confirm('Remove "' + (p.name || 'this product') + '" from the catalogue?')) return;
+    state.products = state.products.filter(function (item) { return item.id !== p.id; });
+    delete photos[p.id];
+    state.selectedId = state.products.length ? state.products[0].id : null;
+    persist();
+    renderEditor();
+    renderList();
+    setStatus('Product removed.', 'warn');
+  }
+
+  function duplicateSelected() {
+    var p = selected();
+    if (!p) return;
+    var copy = JSON.parse(JSON.stringify(p));
+    copy.id = newId();
+    copy.name = (p.name || 'Product') + ' (copy)';
+    copy.slug = uniqueSlug(copy.name, takenSlugs(copy.id));
+    copy.status = 'draft';
+    copy.created_at = nowIso();
+    copy.updated_at = nowIso();
+    if (photos[p.id]) {
+      photos[copy.id] = Object.assign({}, photos[p.id], { filename: copy.slug + '-01.jpg' });
+      copy.image_path = IMAGE_DIR + photos[copy.id].filename;
+      copy.photo_state = 'ready';
+    }
+    var index = state.products.indexOf(p);
+    state.products.splice(index + 1, 0, copy);
+    state.selectedId = copy.id;
+    persist();
+    renderEditor();
+    renderList();
+    setStatus('Duplicated as a draft. Update its name, size and photo.', 'warn');
+  }
+
+  /* ---------------- photo handling ---------------- */
+
+  function loadImage(file) {
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(file);
+      var image = new Image();
+      image.onload = function () { URL.revokeObjectURL(url); resolve(image); };
+      image.onerror = function () { URL.revokeObjectURL(url); reject(new Error('That file could not be read as an image.')); };
+      image.src = url;
+    });
+  }
+
+  function canvasToBlob(canvas, type, quality) {
+    return new Promise(function (resolve) {
+      canvas.toBlob(function (blob) { resolve(blob); }, type, quality);
+    });
+  }
+
+  function blobToDataUrl(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result)); };
+      reader.onerror = function () { reject(new Error('The cropped image could not be read.')); };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function handlePhoto(file) {
+    var p = selected();
+    if (!p || !file) return;
+    if (!/^image\//.test(file.type)) {
+      setStatus('That file is not an image. Use a photo (JPEG, PNG or WebP).', 'bad');
+      return;
+    }
+    setStatus('Cropping the photo to 4:5…', '');
+    try {
+      var image = await loadImage(file);
+      var sourceWidth = image.naturalWidth || image.width;
+      var sourceHeight = image.naturalHeight || image.height;
+      if (!sourceWidth || !sourceHeight) throw new Error('The image has no size.');
+
+      // Centre-crop to 4:5, then cap the height at 1600 px.
+      var targetRatio = 4 / 5;
+      var cropWidth = sourceWidth;
+      var cropHeight = Math.round(sourceWidth / targetRatio);
+      if (cropHeight > sourceHeight) {
+        cropHeight = sourceHeight;
+        cropWidth = Math.round(sourceHeight * targetRatio);
+      }
+      var offsetX = Math.round((sourceWidth - cropWidth) / 2);
+      var offsetY = Math.round((sourceHeight - cropHeight) / 2);
+
+      var maxHeight = 1600;
+      var scale = cropHeight > maxHeight ? maxHeight / cropHeight : 1;
+      var outWidth = Math.max(1, Math.round(cropWidth * scale));
+      var outHeight = Math.max(1, Math.round(cropHeight * scale));
+
+      var canvas = document.createElement('canvas');
+      canvas.width = outWidth;
+      canvas.height = outHeight;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#141018';
+      ctx.fillRect(0, 0, outWidth, outHeight);
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(image, offsetX, offsetY, cropWidth, cropHeight, 0, 0, outWidth, outHeight);
+
+      var blob = await canvasToBlob(canvas, 'image/jpeg', 0.86);
+      if (!blob) throw new Error('The browser could not create the JPEG.');
+      var dataUrl = await blobToDataUrl(blob);
+
+      photos[p.id] = {
+        blob: blob,
+        dataUrl: dataUrl,
+        width: outWidth,
+        height: outHeight,
+        bytes: blob.size,
+        filename: (p.slug || 'product') + '-01.jpg'
+      };
+      p.image_path = IMAGE_DIR + photos[p.id].filename;
+      p.photo_state = 'ready';
+      p.updated_at = nowIso();
+      persist();
+      renderDerived();
+      setStatus('Photo cropped to 4:5 and ' + Math.round(blob.size / 1024) + ' KB. It will be included in the ZIP as ' + photos[p.id].filename + '.', 'ok');
+    } catch (err) {
+      setStatus(String(err && err.message ? err.message : 'The photo could not be processed.'), 'bad');
+    }
+  }
+
+  function downloadBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+  }
+
+  /* ---------------- export ---------------- */
+
+  function buildCatalog() {
+    var products = state.products.map(function (p) {
+      return {
+        id: p.id,
+        slug: p.slug,
+        name: p.name,
+        category: p.category,
+        size_label: p.size_label,
+        summary: p.summary,
+        description: p.description,
+        price_ugx: p.price_ugx,
+        image_path: p.image_path,
+        photo_state: p.photo_state,
+        status: p.status,
+        owner_confirmed: p.owner_confirmed,
+        claims_checked: p.claims_checked,
+        created_at: p.created_at,
+        updated_at: p.updated_at
+      };
+    });
+    return {
+      version: 1,
+      note: 'Catalogue supplied by the shop owner through the standalone builder. Products are published only after the owner confirmed the name, size and price and checked the claims.',
+      settings: {
+        business_name: state.settings.business_name || 'PURITY SKIN',
+        whatsapp_number: String(state.settings.whatsapp_number || '').replace(/\D/g, ''),
+        location: state.settings.location || 'Kampala, Uganda',
+        delivery_summary: state.settings.delivery_summary || '',
+        updated_at: nowIso()
+      },
+      products: products
+    };
+  }
+
+  function exportJson() {
+    var catalog = buildCatalog();
+    if (catalog.settings.whatsapp_number.length < 9) {
+      setStatus('Add a WhatsApp number with at least 9 digits before downloading — the shop uses it for every enquiry button.', 'bad');
+      el('s-whatsapp').focus();
+      return;
+    }
+    var text = JSON.stringify(catalog, null, 2) + '\n';
+    downloadBlob(new Blob([text], { type: 'application/json' }), 'catalog.data.json');
+    dirty = false;
+    setStatus('catalog.data.json downloaded.', 'ok');
+  }
+
+  function reportLines() {
+    var lines = [];
+    var catalog = buildCatalog();
+    lines.push('PURITY SKIN — catalogue handover');
+    lines.push('Generated: ' + new Date().toISOString());
+    lines.push('');
+    lines.push('SHOP');
+    lines.push('  Business name : ' + catalog.settings.business_name);
+    lines.push('  WhatsApp      : ' + (catalog.settings.whatsapp_number || '(missing)'));
+    lines.push('  Location      : ' + catalog.settings.location);
+    lines.push('  Delivery note : ' + (catalog.settings.delivery_summary || '(not provided — confirmed on WhatsApp)'));
+    lines.push('');
+    lines.push('PRODUCTS (' + catalog.products.length + ')');
+    if (!catalog.products.length) lines.push('  (none yet)');
+    catalog.products.forEach(function (p, index) {
+      var gate = validateProduct(p);
+      lines.push('  ' + (index + 1) + '. ' + (p.name || '(unnamed)') + ' — ' + (p.category || 'no type') + ', ' + (p.size_label || 'no size') + ', ' + formatUGX(p.price_ugx));
+      lines.push('     status=' + p.status + '  photo=' + (p.photo_state === 'ready' ? p.image_path : 'none') + '  confirmed=' + p.owner_confirmed + '  claimsChecked=' + p.claims_checked);
+      if (gate.errors.length) lines.push('     BLOCKED: ' + gate.errors.join(' | '));
+      if (gate.warnings.length) lines.push('     notes: ' + gate.warnings.join(' | '));
+    });
+    var missingPhotos = catalog.products.filter(function (p) { return p.photo_state !== 'ready' || !p.image_path; });
+    lines.push('');
+    lines.push('CHECKLIST');
+    lines.push('  Products ready for the shop : ' + catalog.products.filter(function (p) { return p.status === 'published'; }).length);
+    lines.push('  Products blocked by checks   : ' + catalog.products.filter(function (p) { return validateProduct(p).errors.length > 0; }).length);
+    lines.push('  Products without a photo    : ' + missingPhotos.length);
+    if (state.notes.trim()) {
+      lines.push('');
+      lines.push('OWNER NOTES');
+      state.notes.trim().split('\n').forEach(function (line) { lines.push('  ' + line); });
+    }
+    lines.push('');
+    lines.push('INTEGRATION');
+    lines.push('  1. catalog.data.json  →  src/catalog/catalog.data.json');
+    lines.push('  2. images/*.jpg       →  public/images/products/');
+    lines.push('  3. npm run build, then commit and push to main and deploy.');
+    return lines.join('\n');
+  }
+
+  function exportZip() {
+    var catalog = buildCatalog();
+    if (catalog.settings.whatsapp_number.length < 9) {
+      setStatus('Add a WhatsApp number with at least 9 digits before downloading.', 'bad');
+      el('s-whatsapp').focus();
+      return;
+    }
+    var files = [];
+    files.push({ name: 'catalog.data.json', text: JSON.stringify(catalog, null, 2) + '\n' });
+    files.push({ name: 'INTEGRATION-NOTES.txt', text: reportLines() + '\n' });
+    var photoCount = 0;
+    var entries = Object.keys(photos);
+    var pending = [];
+    entries.forEach(function (id) {
+      var photo = photos[id];
+      var product = state.products.filter(function (p) { return p.id === id; })[0];
+      if (!photo || !product) return;
+      pending.push(photo.blob.arrayBuffer().then(function (buffer) {
+        files.push({ name: 'images/' + photo.filename, data: new Uint8Array(buffer) });
+        photoCount += 1;
+      }));
+    });
+
+    Promise.all(pending).then(function () {
+      var blob = makeZip(files);
+      var stamp = new Date().toISOString().slice(0, 10);
+      downloadBlob(blob, 'purity-skin-catalogue-' + stamp + '.zip');
+      dirty = false;
+      setStatus('ZIP downloaded: catalogue JSON, ' + photoCount + ' photo' + (photoCount === 1 ? '' : 's') + ' and the notes file.', 'ok');
+    }).catch(function (err) {
+      setStatus('The ZIP could not be built: ' + (err && err.message ? err.message : 'unknown error') + '. Use “Download catalogue JSON only” and send the photos separately.', 'bad');
+    });
+  }
+
+  /* ---------------- minimal ZIP writer (store, no compression) ---------------- */
+
+  var CRC_TABLE = (function () {
+    var table = new Uint32Array(256);
+    for (var n = 0; n < 256; n += 1) {
+      var c = n;
+      for (var k = 0; k < 8; k += 1) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+      table[n] = c >>> 0;
+    }
+    return table;
+  })();
+
+  function crc32(bytes) {
+    var crc = 0xFFFFFFFF;
+    for (var i = 0; i < bytes.length; i += 1) {
+      crc = (crc >>> 8) ^ CRC_TABLE[(crc ^ bytes[i]) & 0xFF];
+    }
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function makeZip(entries) {
+    var encoder = new TextEncoder();
+    var parts = [];
+    var central = [];
+    var offset = 0;
+    var date = new Date();
+    var dosTime = ((date.getHours() << 11) | (date.getMinutes() << 5) | (Math.floor(date.getSeconds() / 2))) & 0xFFFF;
+    var dosDate = (((date.getFullYear() - 1980) << 9) | ((date.getMonth() + 1) << 5) | date.getDate()) & 0xFFFF;
+
+    entries.forEach(function (entry) {
+      var nameBytes = encoder.encode(entry.name);
+      var data = entry.data ? entry.data : encoder.encode(entry.text || '');
+      var crc = crc32(data);
+
+      var local = new Uint8Array(30 + nameBytes.length);
+      var view = new DataView(local.buffer);
+      view.setUint32(0, 0x04034b50, true);
+      view.setUint16(4, 20, true);        // version needed
+      view.setUint16(6, 0x0800, true);    // UTF-8 filename flag
+      view.setUint16(8, 0, true);         // stored, no compression
+      view.setUint16(10, dosTime, true);
+      view.setUint16(12, dosDate, true);
+      view.setUint32(14, crc, true);
+      view.setUint32(18, data.length, true);
+      view.setUint32(22, data.length, true);
+      view.setUint16(26, nameBytes.length, true);
+      view.setUint16(28, 0, true);
+      local.set(nameBytes, 30);
+
+      parts.push(local);
+      parts.push(data);
+
+      var centralEntry = new Uint8Array(46 + nameBytes.length);
+      var centralView = new DataView(centralEntry.buffer);
+      centralView.setUint32(0, 0x02014b50, true);
+      centralView.setUint16(4, 20, true);
+      centralView.setUint16(6, 20, true);
+      centralView.setUint16(8, 0x0800, true);
+      centralView.setUint16(10, 0, true);
+      centralView.setUint16(12, dosTime, true);
+      centralView.setUint16(14, dosDate, true);
+      centralView.setUint32(16, crc, true);
+      centralView.setUint32(20, data.length, true);
+      centralView.setUint32(24, data.length, true);
+      centralView.setUint16(28, nameBytes.length, true);
+      centralView.setUint16(30, 0, true);
+      centralView.setUint16(32, 0, true);
+      centralView.setUint16(34, 0, true);
+      centralView.setUint16(36, 0, true);
+      centralView.setUint32(38, 0, true);
+      centralView.setUint32(42, offset, true);
+      centralEntry.set(nameBytes, 46);
+      central.push(centralEntry);
+
+      offset += local.length + data.length;
+    });
+
+    var centralSize = central.reduce(function (total, entry) { return total + entry.length; }, 0);
+    var end = new Uint8Array(22);
+    var endView = new DataView(end.buffer);
+    endView.setUint32(0, 0x06054b50, true);
+    endView.setUint16(8, entries.length, true);
+    endView.setUint16(10, entries.length, true);
+    endView.setUint32(12, centralSize, true);
+    endView.setUint32(16, offset, true);
+
+    return new Blob(parts.concat(central).concat([end]), { type: 'application/zip' });
+  }
+
+  /* ---------------- import ---------------- */
+
+  function importText(text) {
+    var parsed;
+    try { parsed = JSON.parse(text); } catch (err) {
+      setStatus('That file is not valid JSON.', 'bad');
+      return;
+    }
+    if (!parsed || typeof parsed !== 'object' || !Array.isArray(parsed.products)) {
+      setStatus('That file does not look like a catalogue (no "products" list).', 'bad');
+      return;
+    }
+    var warnings = [];
+    state.products = parsed.products.map(function (raw) {
+      var product = normalizeProduct(raw);
+      if (product.status === 'published') {
+        var gate = validateProduct(product);
+        if (gate.errors.length) {
+          product.status = 'draft';
+          warnings.push('"' + (product.name || 'Unnamed product') + '" was set back to draft: ' + gate.errors[0]);
+        }
+      }
+      return product;
+    });
+    if (parsed.settings) {
+      state.settings = Object.assign(state.settings, {
+        business_name: parsed.settings.business_name || state.settings.business_name,
+        whatsapp_number: String(parsed.settings.whatsapp_number || '').replace(/\D/g, ''),
+        location: parsed.settings.location || state.settings.location,
+        delivery_summary: parsed.settings.delivery_summary || ''
+      });
+    }
+    var seen = {};
+    state.products.forEach(function (p) {
+      if (!p.slug || seen[p.slug]) {
+        var fixed = uniqueSlug(p.slug || p.name || 'product', Object.keys(seen));
+        if (fixed !== p.slug) warnings.push('Duplicate link "' + p.slug + '" renamed to "' + fixed + '".');
+        p.slug = fixed;
+      }
+      seen[p.slug] = true;
+    });
+    state.selectedId = state.products.length ? state.products[0].id : null;
+    photos = {};
+    slugLocked = {};
+    persist();
+    renderSettings();
+    renderEditor();
+    renderList();
+    setStatus(
+      warnings.length
+        ? 'Imported ' + state.products.length + ' products with adjustments: ' + warnings.slice(0, 2).join(' ')
+        : 'Imported ' + state.products.length + ' products.',
+      warnings.length ? 'warn' : 'ok'
+    );
+  }
+
+  /* ---------------- wiring ---------------- */
+
+  function renderSettings() {
+    el('s-business').value = state.settings.business_name || '';
+    el('s-whatsapp').value = state.settings.whatsapp_number || '';
+    el('s-location').value = state.settings.location || '';
+    el('s-delivery').value = state.settings.delivery_summary || '';
+    el('notes').value = state.notes || '';
+  }
+
+  el('s-business').addEventListener('input', function (e) { state.settings.business_name = e.target.value; persist(); });
+  el('s-whatsapp').addEventListener('input', function (e) {
+    var digits = e.target.value.replace(/\D/g, '');
+    e.target.value = digits;
+    state.settings.whatsapp_number = digits;
+    persist();
+  });
+  el('s-location').addEventListener('input', function (e) { state.settings.location = e.target.value; persist(); });
+  el('s-delivery').addEventListener('input', function (e) { state.settings.delivery_summary = e.target.value; persist(); });
+  el('notes').addEventListener('input', function (e) { state.notes = e.target.value; persist(); });
+
+  el('btn-add').addEventListener('click', addProduct);
+  el('btn-delete').addEventListener('click', deleteSelected);
+  el('btn-duplicate').addEventListener('click', duplicateSelected);
+
+  el('p-name').addEventListener('input', function (e) { onNameInput(e.target.value); });
+  el('p-slug').addEventListener('change', function (e) { onSlugInput(e.target.value); });
+  el('p-category').addEventListener('input', function (e) { updateSelected({ category: e.target.value }); });
+  el('p-size').addEventListener('input', function (e) { updateSelected({ size_label: e.target.value }); });
+  el('p-price').addEventListener('input', function (e) { onPriceInput(e.target.value); });
+  el('p-summary').addEventListener('input', function (e) { updateSelected({ summary: e.target.value }); });
+  el('p-description').addEventListener('input', function (e) { updateSelected({ description: e.target.value }); });
+  el('p-confirmed').addEventListener('change', function (e) { updateSelected({ owner_confirmed: e.target.checked }); });
+  el('p-claims').addEventListener('change', function (e) { updateSelected({ claims_checked: e.target.checked }); });
+  el('p-status').addEventListener('change', function (e) { onStatusChange(e.target.value); });
+
+  el('p-photo').addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    if (file) handlePhoto(file);
+    e.target.value = '';
+  });
+
+  el('btn-photo-clear').addEventListener('click', function () {
+    var p = selected();
+    if (!p) return;
+    delete photos[p.id];
+    updateSelected({ image_path: null, photo_state: 'pending' });
+    renderDerived();
+    setStatus('Photo removed. The shop will show a photo slot for this product.', 'warn');
+  });
+
+  el('btn-photo-download').addEventListener('click', function () {
+    var p = selected();
+    var photo = p ? photos[p.id] : null;
+    if (!photo) return;
+    downloadBlob(photo.blob, photo.filename);
+    setStatus('Photo saved as ' + photo.filename + '.', 'ok');
+  });
+
+  function doExport() { exportZip(); }
+  el('btn-export').addEventListener('click', doExport);
+  el('btn-export-2').addEventListener('click', doExport);
+  el('btn-json').addEventListener('click', exportJson);
+
+  el('btn-copy').addEventListener('click', function () {
+    var text = reportLines();
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function () {
+        setStatus('Summary copied. Paste it into the chat if you want a quick review before integrating.', 'ok');
+      }).catch(function () {
+        setStatus('The clipboard is blocked here. Use “Download everything” instead — the same summary is inside the ZIP.', 'warn');
+      });
+    } else {
+      setStatus('The clipboard is not available here. Use “Download everything” — the summary is inside the ZIP.', 'warn');
+    }
+  });
+
+  el('btn-reset').addEventListener('click', function () {
+    if (!window.confirm('Clear everything and start from an empty catalogue? Download the ZIP first if you want to keep this work.')) return;
+    state.products = [];
+    state.selectedId = null;
+    state.notes = '';
+    photos = {};
+    slugLocked = {};
+    try { localStorage.removeItem(STORAGE_KEY); } catch (err) { /* nothing to clear */ }
+    renderSettings();
+    renderEditor();
+    renderList();
+    setStatus('Cleared. The catalogue is empty again.', 'warn');
+  });
+
+  el('btn-import').addEventListener('click', function () { el('import-input').click(); });
+  el('import-input').addEventListener('change', function (e) {
+    var file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    if (/\.zip$/i.test(file.name) || file.type === 'application/zip') {
+      setStatus('A ZIP was chosen. Import needs the catalog.data.json file — unzip it first, then import that JSON.', 'warn');
+      return;
+    }
+    var reader = new FileReader();
+    reader.onload = function () { importText(String(reader.result)); };
+    reader.onerror = function () { setStatus('That file could not be read.', 'bad'); };
+    reader.readAsText(file);
+  });
+
+  // Only interrupt leaving the page when something has not been downloaded yet.
+  window.addEventListener('beforeunload', function (event) {
+    if (dirty && state.products.length) {
+      event.preventDefault();
+      event.returnValue = '';
+    }
+  });
+
+  /* ---------------- boot ---------------- */
+
+  restore();
+  renderSettings();
+  if (state.products.length) {
+    if (!state.selectedId) state.selectedId = state.products[0].id;
+    renderEditor();
+  }
+  renderList();
+  renderStats();
+})();
+</script>
+</body>
+</html>
