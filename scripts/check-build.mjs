@@ -65,7 +65,7 @@ for (const href of cssMatches) {
 }
 
 // 3. Files Pages needs, in the folder Pages publishes.
-for (const file of ['_redirects', '_headers', 'manifest.webmanifest', 'sw.js', 'robots.txt', 'sitemap.xml', 'og.png', 'icon.svg']) {
+for (const file of ['_redirects', '_headers', 'manifest.webmanifest', 'sw.js', 'robots.txt', 'sitemap.xml', 'og.png', 'brand/purity-mark.png']) {
   if (!(await exists(file))) fail(`Missing required file in the build output: ${file}`)
 }
 

@@ -22,7 +22,7 @@ export function PublicLayout() {
   return <div className={`store-page${items > 0 ? ' has-enquiry-bar' : ''}`}>
     <header className="store-header">
       <Link className="brand-lockup" to="/" aria-label="PURITY SKIN home">
-        <span className="brand-monogram">PS</span>
+        <span className="brand-monogram"><img src="/brand/purity-mark.png" alt="" width={39} height={39} /></span>
         <span><strong>{settings.business_name}</strong><small>FORMULATED TO FIX · KAMPALA</small></span>
       </Link>
 
@@ -57,7 +57,7 @@ export function PublicLayout() {
 
     <footer className="store-footer">
       <div className="footer-brand">
-        <span className="brand-monogram" aria-hidden="true">PS</span>
+        <span className="brand-monogram" aria-hidden="true"><img src="/brand/purity-mark.png" alt="" width={39} height={39} /></span>
         <span><strong>{settings.business_name}</strong><small>{settings.location} · FORMULATED TO FIX</small></span>
       </div>
       <div className="footer-columns">

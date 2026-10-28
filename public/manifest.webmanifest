@@ -6,8 +6,8 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#141018",
-  "theme_color": "#141018",
+  "background_color": "#0D0A0B",
+  "theme_color": "#C2B7BD",
   "icons": [
     {
       "src": "/icons/purity-192.png",

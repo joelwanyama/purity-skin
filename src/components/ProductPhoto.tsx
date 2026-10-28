@@ -25,7 +25,7 @@ export function ProductPhoto({ name, imagePath, photoState, variant = 'card', pr
         aria-label={`Photo slot for ${name || 'this product'}: an approved product photo is needed`}
       >
         <span className="slot-ring" aria-hidden="true" />
-        <span className="slot-monogram" aria-hidden="true">PS</span>
+        <img className="slot-logo" src="/brand/purity-mark.png" alt="" width={68} height={68} aria-hidden="true" />
         <span className="slot-label">
           <ImageOff size={13} aria-hidden="true" />
           PHOTO SLOT

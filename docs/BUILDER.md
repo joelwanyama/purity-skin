@@ -23,10 +23,15 @@ It also previews the product card exactly as the shop renders it, so what the ow
 ```
 catalog.data.json                    → src/catalog/catalog.data.json
 images/<product-slug>-01.jpg         → public/images/products/
+whatsapp-catalog.csv                 → Meta Commerce Manager / WhatsApp Business catalogue feed
 INTEGRATION-NOTES.txt                → what was entered, blocked items, checklist, owner notes
 ```
 
+The CSV is the same catalogue as a product feed: one row per published product that has both a price and a photo, with the title, the description, `48000 UGX`, the product link and an absolute photo URL. Anything missing a price or a photo is left out rather than guessed. It can also be downloaded on its own with **WhatsApp catalogue CSV**.
+
 **Download catalogue JSON only** — just the catalogue, for quick edits.
+
+**WhatsApp catalogue CSV** — the feed above, on its own, for uploading to the WhatsApp Business catalogue so the same products are not typed twice.
 
 Both are validated against the same parser the app uses (`parseCatalog`), which also demotes any product marked `published` that fails the gate, so an unsafe file cannot reach the shop.
 

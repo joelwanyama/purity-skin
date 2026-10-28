@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="PURITY SKIN">
-  <rect width="512" height="512" fill="#141018"/>
-  <circle cx="256" cy="256" r="196" fill="none" stroke="#3a2f47" stroke-width="2"/>
-  <circle cx="256" cy="256" r="138" fill="none" stroke="#e88bb0" stroke-width="1.5" opacity="0.55"/>
-  <text x="256" y="252" fill="#f7c9dd" font-family="DejaVu Sans Mono,monospace" font-size="150" font-weight="700" letter-spacing="-10" text-anchor="middle" dominant-baseline="central">PS</text>
-  <text x="256" y="424" fill="#b7a8c7" font-family="DejaVu Sans Mono,monospace" font-size="17" letter-spacing="6" text-anchor="middle">FORMULATED TO FIX</text>
-</svg>

@@ -2,18 +2,21 @@
 
 What exists today, what is still needed, and the exact rules so new files drop in without rework.
 
-Everything currently in `public/` is made from the brand palette by us — no photography has been invented, generated or downloaded.
+Every mark in `public/` now derives from the **official PURITY SKIN artwork** — the profile picture the shop publishes on its WhatsApp Business account, saved at `brand-src/purity-skin-whatsapp-profile.jpg`. No logo has been drawn, approximated or generated. No product photography has been invented, downloaded or generated.
 
 ## What ships now
 
 | File | Size | Purpose | Source |
 | --- | --- | --- | --- |
-| `public/og.png` | 1200×630 | WhatsApp/Facebook/X link preview | `assets-src/og.svg` |
-| `public/icons/purity-512.png` | 512×512 | PWA install icon | `assets-src/icon.svg` |
-| `public/icons/purity-192.png` | 192×192 | PWA install icon | `assets-src/icon.svg` |
-| `public/icons/apple-touch-icon.png` | 180×180 | iOS home screen | `assets-src/icon.svg` |
-| `public/favicon-32.png` | 32×32 | Browser tab | `assets-src/icon.svg` |
-| `public/icon.svg` | vector | Scalable tab icon | `assets-src/icon.svg` |
+| `public/brand/purity-skin-avatar.jpg` | 640×640 | The artwork exactly as WhatsApp serves it | profile picture, copied verbatim |
+| `public/brand/purity-mark.png` | 512×512 | Site mark (header, footer, hero, photo slots) | centre crop of the artwork |
+| `public/og.png` | 1200×630 | WhatsApp/Facebook/X link preview | artwork on brand greige, composed |
+| `public/icons/purity-512.png` | 512×512 | PWA install icon | `purity-mark.png` |
+| `public/icons/purity-192.png` | 192×192 | PWA install icon | `purity-mark.png` |
+| `public/icons/apple-touch-icon.png` | 180×180 | iOS home screen | `purity-mark.png` |
+| `public/favicon-32.png` | 32×32 | Browser tab | `purity-mark.png` |
+
+The old `public/icon.svg` and its `assets-src/*.svg` sources were an invented approximation of the logo and have been removed. There is no vector version of this artwork; do not recreate one by hand.
 
 Regenerate everything with:
 
@@ -21,7 +24,9 @@ Regenerate everything with:
 npm run assets
 ```
 
-The script renders the SVG sources with Chromium (`scripts/build-brand-assets.mjs`) rather than ImageMagick, because ImageMagick's SVG renderer mangles text. Do not hand-edit the PNGs.
+`scripts/build-brand-assets.mjs` derives every raster from `brand-src/purity-skin-whatsapp-profile.jpg` with ImageMagick (`magick` or `convert` must be on PATH). If the shop changes its profile picture, replace that one file and run the script — do not hand-edit the PNGs.
+
+To refresh the source file: fetch `https://wa.me/256757377624` with a normal browser user agent, read the `og:image` URL from the HTML, and save it as `brand-src/purity-skin-whatsapp-profile.jpg`. The signed URL expires, so re-fetch rather than reuse an old link.
 
 The touch icon and favicon are generated from the same square artwork; iOS applies its own rounded mask, so keep all content inside the central 80%.
 

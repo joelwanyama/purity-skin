@@ -45,7 +45,7 @@ export function Home() {
       <div className="hero-art" aria-hidden="true">
         <div className="art-ring" />
         <div className="art-caption"><span>FORMULATED TO FIX</span><span>PS / KLA</span></div>
-        <div className="art-mark">PS</div>
+        <img className="art-logo" src="/brand/purity-mark.png" alt="" width={230} height={230} />
         <p className="art-note">FORMULATED IN KAMPALA<br /><b>UGANDA</b></p>
       </div>
     </section>
