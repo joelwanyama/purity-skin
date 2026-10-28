@@ -179,7 +179,7 @@ for (const product of published) {
 for (const product of published) {
   const slug = String(product.slug).trim()
   if (!product.price_ugx) continue
-  if (!(await exists(`downloads/cards/${slug}.png`))) {
+  if (!(await exists(`downloads/cards/${slug}.jpg`))) {
     notes.push(`No Status card for "${slug}" yet. Run \`npm run export:cards\`. The owner dashboard links only cards that exist.`)
   }
 }

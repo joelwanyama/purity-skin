@@ -9,7 +9,7 @@
  *    no "before/after", no discount urgency, nothing that would need evidence;
  *  - the shop's own artwork and colours are used, never an invented template.
  *
- * Usage: npm run export:cards       → public/downloads/cards/<slug>.png
+ * Usage: npm run export:cards       → public/downloads/cards/<slug>.jpg
  */
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
@@ -117,8 +117,11 @@ for (const product of products) {
     ...(whatsapp
       ? ['-font', MONO, '-pointsize', '21', '-kerning', '2', '-gravity', 'southeast', '-annotate', `+${PAD}+34`, `WHATSAPP ${whatsapp}`, '-gravity', 'northwest']
       : []),
-    '-strip', '-depth', '8', '-quality', '90',
-    path.join(OUT_DIR, `${slug}.png`),
+    // JPEG, not PNG: a 1080x1080 card with a photo is ~1.0 MB as a PNG and
+    // ~150 kB at this quality, and WhatsApp re-encodes either way. The backlog
+    // budget is 300 kB per card; measured output is well inside it.
+    '-strip', '-sampling-factor', '4:2:0', '-depth', '8', '-quality', '90',
+    path.join(OUT_DIR, `${slug}.jpg`),
   ]
 
   execFileSync(magick, args)

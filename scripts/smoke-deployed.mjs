@@ -94,8 +94,8 @@ try {
       /<div id="root">/.test(page.body) && /<script[^>]+src="\/assets\/[^"]+\.js"/.test(page.body),
       'the page is missing the app shell or the built bundle',
     )
-    const card = await get(`/downloads/cards/${slug}.png`)
-    if (card.status === 200) check(`/downloads/cards/${slug}.png is a real PNG`, card.type.includes('image/png'), `content-type ${card.type}`)
+    const card = await get(`/downloads/cards/${slug}.jpg`)
+    if (card.status === 200) check(`/downloads/cards/${slug}.jpg is a real image`, card.type.includes('image/jpeg'), `content-type ${card.type}`)
     else note(`no Status card published for "${slug}" yet`)
   }
 

@@ -12,11 +12,29 @@ Status legend: **done** · **ready** (no blockers) · **needs owner** (blocked o
 | --- | --- | --- |
 | 1 | Per-product share pages with real previews | `scripts/lib/prerender.mjs` + 10 unit tests; `check-build` fails when a published product has no page; live smoke test requests each page from `/prerender.json`. See `docs/SHARE-PAGES.md` |
 | 2 | Photo pipeline: 480 px card, 1200 × 630 share crop, `srcset`/`sizes`, measured `width`/`height`, lazy | `scripts/build-photo-variants.mjs`, `src/catalog/photo-variants.json`, `ProductPhoto.tsx`; measured 296 kB → 41 kB per card. See `docs/PHOTO-PIPELINE.md` |
-| 3 | 1080 × 1080 Status price cards | `npm run export:cards` → `public/downloads/cards/<slug>.png`, only for published products with a confirmed price |
+| 3 | 1080 × 1080 Status price cards | `npm run export:cards` → `public/downloads/cards/<slug>.jpg` (157 kB measured on a 1080 × 1080 card with a photo, budget 300 kB), only for published products with a confirmed price |
 | 4 | UNBS / PDPO pack record, owner-first | `src/lib/compliance.ts` + 17 unit tests, `ComplianceNotes`/`ComplianceEditor`, builder section + notes panel, `/policies#pack-record` |
 | 5 | Aggregate, cookieless counting — **off by default** | `src/lib/analytics.ts` + 4 tests; nothing is collected until `VITE_CF_BEACON_TOKEN` is set. See `docs/PRIVACY-ANALYTICS.md` |
 | 6 | Browser-local order ledger | `/studio/ledger`, `src/order/ledger.ts` + 17 tests: paste parsing, statuses, CSV, JSON backup, storage sanitising |
 | 7 | Owner guide, written for a phone | `docs/OWNER-GUIDE.md` → `npm run guide` → printable PDF + HTML copy in `public/downloads/` |
+
+### Verified on the live URL (29 October 2026, commit `bc2b183`)
+
+Everything below was checked in a real browser against `https://purityskin.pages.dev`, at 390 × 844 and 1280 × 900, with no console or page errors:
+
+| Check | Result |
+| --- | --- |
+| Deployment smoke test (extended) | 16 checks passed: build output, `/shop` prerendered title and canonical, `/prerender.json` readable, honest "no products yet" note, PDF/HTML/builder downloads |
+| `/studio/ledger` | loads, paste parses `2 × Live check (test only) (30 ml) — UGX 96,000`, "not a backup" warning present, axe clean |
+| `/studio/catalogue` | with the committed empty catalogue the notes panel is **absent** (nothing to report); with a browser draft it lists the gaps and the pack record reads `3 of 4 confirmed · 3 shown` |
+| `/shop/<draft>` | 3 confirmed pack rows shown, unconfirmed batch code hidden |
+| `/policies#pack-record` | section present; counting paragraph reads "This shop does not run analytics…"; **0** analytics scripts in the page |
+| `/downloads/purity-skin-owner-guide.pdf` | HTTP 200, `application/pdf`, real `%PDF-` header, 526 kB; HTML copy 715 kB; builder 121 kB |
+| CI | `Cloudflare Pages` and `verify` (lint, typecheck, 106 unit tests, embedded-Postgres tests, build, committed-dist check, Playwright + axe) both green |
+
+### Known limitation of this environment
+
+The full Playwright suite (54 tests) passes in CI but is flaky **in this 2 GB sandbox** when run with two workers: Chromium is killed mid-test (`Target crashed`). Running the suites with `--workers=1` gives 8/8 and 22/22. This is a local resource limit, not a product defect.
 
 ## Shipped in the previous round
 
