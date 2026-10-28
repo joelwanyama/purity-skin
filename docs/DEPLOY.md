@@ -2,25 +2,36 @@
 
 The site is a static build. Whatever builds it must run `npm run build` and publish the `dist` folder — Cloudflare Pages is currently publishing the **repository root** instead, which is why `purityskin.pages.dev` shows a blank page.
 
-## What is wrong right now
+## Current state (verified 2026-10-28, 19:44 UTC)
 
-Verified against the live site on 2026-10-28:
+**Working.** `https://purityskin.pages.dev` now serves the built application:
 
-| Request | Expected | Actual |
-| --- | --- | --- |
-| `/` | built `index.html` loading `/assets/index-*.js` | source `index.html` loading `/src/main.tsx` |
-| `/src/main.tsx` | 404 | 200, raw TypeScript |
-| `/sw.js` | the service worker | the same HTML page |
-| `/og.png` | a PNG | the same HTML page |
-| `/robots.txt` | the robots file | the same HTML page |
-
-Cloudflare reports the deploy as **successful** because with no build command there is nothing to fail. Reproduce the diagnosis at any time:
-
-```sh
-npm run smoke -- https://purityskin.pages.dev   # exits non-zero while broken
+```
+✓ home serves the built bundle        (/assets/index-*.js, no /src/*.tsx)
+✓ /sw.js is the service worker
+✓ /shop resolves through the SPA fallback
+✓ /og.png is a real PNG
+✓ /robots.txt is served as text
+✓ /owner returns the app shell
 ```
 
-## Fix A — dashboard only (fastest, ~30 seconds)
+Reproduce any time with `npm run smoke -- https://purityskin.pages.dev`.
+
+### How it was fixed without dashboard access
+
+Cloudflare Pages was publishing the repository root because the project has no build command and no output directory. Since that setting lives in the dashboard, the fix was moved into the repository instead:
+
+1. **`wrangler.jsonc` now declares `pages_build_output_dir: "./dist"`.** Pages treats this file as its source of truth, so it publishes `dist/` rather than the repo root. Workers-only keys (`assets`, `upload_source_maps`) had to be removed first — with them present the Pages build fails outright (that was the failed build on commit `c017657`).
+2. **The built site is committed.** Pages runs no build, so `dist/` must exist in the branch. `dist/` is no longer gitignored; refresh it with `npm run publish:build`.
+3. **Workers-only artefacts are stripped after each build** (`scripts/postbuild.mjs` removes `dist/wrangler.json` and `dist/.assetsignore`). `wrangler.json` embeds absolute build-machine paths, which made output non-deterministic and tripped the CI staleness check.
+4. **CI fails if the committed build is stale** — `quality.yml` rebuilds and rejects a dirty `dist/`, so a source change can never ship without its build.
+
+Two notes:
+
+- The production alias took roughly two minutes to switch over after the build succeeded; an early smoke run still showed the old content.
+- If you later set a build command in the dashboard, delete `dist/` from the repository and re-add it to `.gitignore` — otherwise the committed output and the fresh build will fight.
+
+## Fix A — dashboard build settings (optional now, but the tidiest setup)
 
 Workers & Pages → **purityskin** → Settings → **Build configuration** → Edit:
 

@@ -4,6 +4,9 @@ node_modules
 # running a build, so the built site must exist in the branch. Refresh it with
 # `npm run publish:build` (CI fails if it is out of date).
 .wrangler
+# Workers-only build artefacts, removed by scripts/postbuild.mjs
+dist/wrangler.json
+dist/.assetsignore
 .dev.vars*
 .env
 .env.*
