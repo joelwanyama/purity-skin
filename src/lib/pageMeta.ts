@@ -45,6 +45,9 @@ export function usePageMeta({ title, description, path, noindex = false }: Meta)
     meta('twitter:title', fullTitle)
 
     const origin = window.location.origin
+    // WhatsApp and other crawlers ignore relative image URLs, so always absolute.
+    meta('og:image', `${origin}/og.png`, true)
+    meta('twitter:image', `${origin}/og.png`)
     if (path) {
       upsert('link[rel="canonical"]', () => document.createElement('link'), (element) => {
         element.setAttribute('rel', 'canonical')

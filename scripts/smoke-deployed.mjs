@@ -60,6 +60,24 @@ try {
   const isPng = ogBytes[0] === 0x89 && ogBytes[1] === 0x50 && ogBytes[2] === 0x4e && ogBytes[3] === 0x47
   check('/og.png is a real PNG', og.status === 200 && isPng, `status ${og.status}, PNG signature ${isPng ? 'ok' : 'missing'}`)
 
+  // WhatsApp and Meta only accept absolute image URLs in a link preview.
+  const ogImage = home.body.match(/<meta property="og:image" content="([^"]+)"/)?.[1] ?? ''
+  check(
+    'og:image is an absolute https URL',
+    /^https:\/\/[^\s]+$/.test(ogImage),
+    `found "${ogImage}" — a relative path is ignored by WhatsApp`,
+  )
+
+  const brandMark = await get('/brand/purity-mark.png')
+  check('/brand/purity-mark.png is served', brandMark.status === 200 && /image\/png/.test(brandMark.type), `status ${brandMark.status}, ${brandMark.type || 'unknown type'}`)
+
+  const builder = await get('/downloads/purity-skin-catalogue-builder.html')
+  check(
+    'the offline catalogue builder is downloadable',
+    builder.status === 200 && /Catalogue Builder/.test(builder.body),
+    `status ${builder.status}`,
+  )
+
   const robots = await get('/robots.txt')
   check('/robots.txt is served as text', robots.body.includes('Disallow: /owner'), 'robots.txt missing the owner-workspace disallow rule')
 
