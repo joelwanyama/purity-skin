@@ -1,6 +1,8 @@
 node_modules
 .DS_Store
-dist
+# dist is committed on purpose: the Pages project publishes the repository without
+# running a build, so the built site must exist in the branch. Refresh it with
+# `npm run publish:build` (CI fails if it is out of date).
 .wrangler
 .dev.vars*
 .env

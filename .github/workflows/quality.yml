@@ -38,6 +38,15 @@ jobs:
         run: npm audit --audit-level=low
       - name: Production build
         run: npm run build
+
+      - name: Verify the committed build output is current
+        run: |
+          npm run check:build
+          if [ -n "$(git status --porcelain dist)" ]; then
+            echo "::error title=Stale build output::dist/ in the repository does not match a fresh build. Run npm run publish:build and commit the result."
+            git status --porcelain dist
+            exit 1
+          fi
       - name: Install Chromium for browser gate
         run: npx playwright install --with-deps chromium
       - name: Playwright UI and accessibility gate
