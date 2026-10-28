@@ -21,6 +21,8 @@
   X-Robots-Tag: noindex, nofollow
 /studio/*
   X-Robots-Tag: noindex, nofollow
+/enquiry
+  X-Robots-Tag: noindex, nofollow
 
 /robots.txt
   Cache-Control: public, max-age=3600

@@ -1,14 +1,16 @@
-import { ArrowLeft, ArrowUpRight, MessageCircle, PackageCheck, ShieldQuestion, Truck } from 'lucide-react'
+import { ArrowLeft, Check, MessageCircle, PackageCheck, Plus, ShieldQuestion, Truck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { ProductPhoto } from '../components/ProductPhoto'
 import { findPublishedBySlug, publishedProducts } from '../catalog/storage'
 import { useShopCatalog } from '../catalog/useShopCatalog'
+import { useEnquiry } from '../order/useEnquiry'
 import { formatUGX, whatsappHref } from '../lib/format'
 import { usePageMeta } from '../lib/pageMeta'
 
 export function ProductDetail() {
   const { slug = '' } = useParams()
   const { products, settings } = useShopCatalog()
+  const { add, quantityOf } = useEnquiry()
   const product = findPublishedBySlug(products, slug)
   usePageMeta({
     title: product ? `${product.name}${product.size_label ? ` ${product.size_label}` : ''}` : 'Product not listed',
@@ -41,6 +43,7 @@ export function ProductDetail() {
 
   const enquire = whatsappHref(settings.whatsapp_number, `Hello PURITY SKIN, I would like to ask about ${product.name}${product.size_label ? ` (${product.size_label})` : ''}.`)
   const related = publishedProducts(products).filter((item) => item.id !== product.id).slice(0, 3)
+  const inList = quantityOf(product.id)
 
   return <div className="page">
     <nav className="breadcrumb" aria-label="Breadcrumb">
@@ -66,8 +69,15 @@ export function ProductDetail() {
           {enquire
             ? <a className="button button-primary" href={enquire} target="_blank" rel="noreferrer"><MessageCircle size={17} aria-hidden="true" /> Ask about this product</a>
             : <span className="muted-note">Contact details are being confirmed.</span>}
-          <Link className="button button-secondary" to="/how-to-order">How ordering works <ArrowUpRight size={15} aria-hidden="true" /></Link>
+          {inList > 0
+            ? <Link className="button button-secondary" to="/enquiry"><Check size={16} aria-hidden="true" /> In your enquiry · {inList}</Link>
+            : <button
+                type="button"
+                className="button button-secondary"
+                onClick={() => add(product)}
+              ><Plus size={16} aria-hidden="true" /> Add to enquiry</button>}
         </div>
+        <p className="detail-fineprint">Adding to the enquiry only builds a message. It does not reserve the item or take payment — <Link to="/how-to-order">how ordering works</Link>.</p>
 
         <dl className="detail-facts">
           <div><dt><Truck size={15} aria-hidden="true" /> Delivery</dt><dd>{settings.delivery_summary || 'Confirmed on WhatsApp before you pay.'}</dd></div>

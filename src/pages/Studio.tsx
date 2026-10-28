@@ -298,7 +298,7 @@ export function Studio() {
 
               <div className="studio-preview">
                 <p className="gate-title">How the card will look</p>
-                <ProductCard product={selected} whatsappNumber={draftSettings.whatsapp_number} />
+                <ProductCard product={selected} />
               </div>
             </div>}
       </section>

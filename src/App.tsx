@@ -3,11 +3,13 @@ import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'rea
 import { AuthProvider } from './auth/AuthProvider'
 import { useAuth } from './auth/useAuth'
 import { CatalogProvider } from './catalog/CatalogProvider'
+import { EnquiryProvider } from './order/EnquiryProvider'
 import { PublicLayout } from './components/PublicLayout'
 import { hasSupabaseConfig } from './lib/supabase'
 import { About } from './pages/About'
 import { Customers } from './pages/Customers'
 import { Dashboard } from './pages/Dashboard'
+import { Enquiry } from './pages/Enquiry'
 import { Home } from './pages/Home'
 import { HowToOrder } from './pages/HowToOrder'
 import { Inventory } from './pages/Inventory'
@@ -38,12 +40,13 @@ function OwnerRoutes() {
 }
 
 export default function App() {
-  return <CatalogProvider><BrowserRouter><ScrollToTop /><AuthProvider><Routes>
+  return <CatalogProvider><EnquiryProvider><BrowserRouter><ScrollToTop /><AuthProvider><Routes>
     <Route element={<PublicLayout />}>
       <Route path="/" element={<Home />} />
       <Route path="/shop" element={<Shop />} />
       <Route path="/shop/:slug" element={<ProductDetail />} />
       <Route path="/how-to-order" element={<HowToOrder />} />
+      <Route path="/enquiry" element={<Enquiry />} />
       <Route path="/about" element={<About />} />
       <Route path="/policies" element={<Policies />} />
       <Route path="/studio/catalogue" element={<Studio />} />
@@ -58,5 +61,5 @@ export default function App() {
       <Route path="customers" element={<Customers />} />
       <Route path="*" element={<Navigate to="/owner" replace />} />
     </Route>
-  </Routes></AuthProvider></BrowserRouter></CatalogProvider>
+  </Routes></AuthProvider></BrowserRouter></EnquiryProvider></CatalogProvider>
 }

@@ -25,7 +25,7 @@ export function Shop() {
     <header className="page-header">
       <p className="section-kicker">THE SHOP</p>
       <h1>Everything currently listed.</h1>
-      <p className="page-intro">Prices are shown in Ugandan shillings. Nothing is added to your cart here — you confirm the order with us on WhatsApp.</p>
+      <p className="page-intro">Prices are shown in Ugandan shillings. Add what you want to ask about and send the list in one WhatsApp message — there is no checkout and no payment on this site.</p>
     </header>
 
     {list.length === 0
@@ -63,7 +63,7 @@ export function Shop() {
               <div className="empty-actions"><button type="button" className="button button-secondary" onClick={() => { setCategory('All'); setQuery('') }}>Clear filters</button></div>
             </div>
           : <div className="product-grid">
-              {visible.map((product, index) => <ProductCard key={product.id} product={product} whatsappNumber={settings.whatsapp_number} priority={index === 0} />)}
+              {visible.map((product, index) => <ProductCard key={product.id} product={product} priority={index === 0} />)}
             </div>}
       </>}
   </div>

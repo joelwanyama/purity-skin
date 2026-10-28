@@ -2,13 +2,16 @@ import { fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { CatalogProvider } from '../catalog/CatalogProvider'
+import { EnquiryProvider } from '../order/EnquiryProvider'
 import { STORAGE_KEY } from '../catalog/storage'
 import { Studio } from './Studio'
 
 function renderStudio() {
   return render(
     <CatalogProvider>
-      <MemoryRouter><Studio /></MemoryRouter>
+      <EnquiryProvider>
+        <MemoryRouter><Studio /></MemoryRouter>
+      </EnquiryProvider>
     </CatalogProvider>,
   )
 }

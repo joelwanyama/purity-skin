@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { MessageCircle, Menu, X } from 'lucide-react'
 import { useShopCatalog } from '../catalog/useShopCatalog'
+import { useEnquiry } from '../order/useEnquiry'
+import { EnquiryBar } from './EnquiryBar'
 import { whatsappHref } from '../lib/format'
 
 const links = [
@@ -13,10 +15,11 @@ const links = [
 
 export function PublicLayout() {
   const { settings } = useShopCatalog()
+  const { items } = useEnquiry()
   const [menuOpen, setMenuOpen] = useState(false)
   const generalWa = whatsappHref(settings.whatsapp_number, 'Hello PURITY SKIN, please tell me what is currently available.')
 
-  return <div className="store-page">
+  return <div className={`store-page${items > 0 ? ' has-enquiry-bar' : ''}`}>
     <header className="store-header">
       <Link className="brand-lockup" to="/" aria-label="PURITY SKIN home">
         <span className="brand-monogram">PS</span>
@@ -80,5 +83,7 @@ export function PublicLayout() {
       </div>
       <p className="footer-legal">No account needed to browse. Orders are confirmed with a real person on WhatsApp. This site does not take payment.</p>
     </footer>
+
+    <EnquiryBar />
   </div>
 }

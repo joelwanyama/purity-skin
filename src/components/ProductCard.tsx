@@ -1,17 +1,18 @@
-import { ArrowUpRight, MessageCircle } from 'lucide-react'
+import { Check, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import type { CatalogProduct } from '../catalog/types'
-import { formatUGX, whatsappHref } from '../lib/format'
+import { formatUGX } from '../lib/format'
+import { useEnquiry } from '../order/useEnquiry'
 import { ProductPhoto } from './ProductPhoto'
 
 type Props = {
   product: CatalogProduct
-  whatsappNumber: string
   priority?: boolean
 }
 
-export function ProductCard({ product, whatsappNumber, priority = false }: Props) {
-  const enquire = whatsappHref(whatsappNumber, `Hello PURITY SKIN, I would like to ask about ${product.name}.`)
+export function ProductCard({ product, priority = false }: Props) {
+  const { add, quantityOf } = useEnquiry()
+  const inList = quantityOf(product.id)
 
   return (
     <article className="product-card">
@@ -32,13 +33,20 @@ export function ProductCard({ product, whatsappNumber, priority = false }: Props
         <p className="card-summary">{product.summary || product.description}</p>
         <div className="card-foot">
           <strong>{formatUGX(product.price_ugx)}</strong>
-          {enquire
-            ? <a className="button button-quiet" href={enquire} target="_blank" rel="noreferrer">
-                <MessageCircle size={15} aria-hidden="true" /> Ask about this
-              </a>
-            : <Link className="button button-quiet" to={`/shop/${product.slug}`}>
-                Details <ArrowUpRight size={15} aria-hidden="true" />
-              </Link>}
+          <div className="card-actions">
+            {inList > 0
+              ? <Link className="button button-secondary button-small card-added" to="/enquiry">
+                  <Check size={14} aria-hidden="true" /> In enquiry · {inList}
+                </Link>
+              : <button
+                  type="button"
+                  className="button button-secondary button-small"
+                  onClick={() => add(product)}
+                  aria-label={`Add ${product.name} to your enquiry`}
+                >
+                  <Plus size={14} aria-hidden="true" /> Add
+                </button>}
+          </div>
         </div>
       </div>
     </article>

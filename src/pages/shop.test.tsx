@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { CatalogProvider } from '../catalog/CatalogProvider'
+import { EnquiryProvider } from '../order/EnquiryProvider'
 import { STORAGE_KEY } from '../catalog/storage'
 import { Home } from './Home'
 import { Shop } from './Shop'
@@ -12,7 +13,9 @@ import { Policies } from './Policies'
 function renderAt(ui: React.ReactElement, path = '/') {
   return render(
     <CatalogProvider>
-      <MemoryRouter initialEntries={[path]}>{ui}</MemoryRouter>
+      <EnquiryProvider>
+        <MemoryRouter initialEntries={[path]}>{ui}</MemoryRouter>
+      </EnquiryProvider>
     </CatalogProvider>,
   )
 }

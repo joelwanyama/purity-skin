@@ -7,6 +7,7 @@ const pages = [
   { path: '/how-to-order', heading: /four steps, one conversation/i },
   { path: '/about', heading: /formulated to fix\. sold honestly/i },
   { path: '/policies', heading: /how this shop actually works/i },
+  { path: '/enquiry', heading: /nothing on your list yet|your enquiry/i },
 ]
 
 test('public pages are honest, readable and fit a phone viewport', async ({ page }) => {

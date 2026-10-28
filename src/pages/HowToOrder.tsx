@@ -6,7 +6,7 @@ import { usePageMeta } from '../lib/pageMeta'
 
 const steps = [
   { icon: Search, title: '1. Find the product', body: 'Browse the shop and open the product you are interested in. The price you see is the confirmed price, not an estimate.' },
-  { icon: MessageCircle, title: '2. Message us', body: 'Tap “Ask about this product”. The message arrives in our WhatsApp inbox with the product name already filled in.' },
+  { icon: MessageCircle, title: '2. Message us', body: 'Tap “Add” on the products you want, open your enquiry, then send the list. The message arrives in our WhatsApp inbox with names, sizes and the listed prices already filled in.' },
   { icon: Truck, title: '3. Agree delivery', body: 'We confirm availability, where you are and how the item reaches you. Nothing is added to an automatic cart.' },
   { icon: Wallet, title: '4. Pay once confirmed', body: 'Payment is arranged directly with PURITY SKIN after you both agree the order and the total. This website never handles your money.' },
 ]
@@ -38,7 +38,7 @@ export function HowToOrder() {
     <section className="info-block" aria-labelledby="what-to-send">
       <h2 id="what-to-send">What to include in your message</h2>
       <ul className="plain-list">
-        <li>The product name and pack size you want.</li>
+        <li>The product name and pack size you want — the enquiry list fills this in for you.</li>
         <li>The area or neighbourhood for delivery, so we can answer about delivery honestly.</li>
         <li>Anything relevant about your skin: sensitivity, allergies, or products you already use.</li>
         <li>Any question you want answered before you commit.</li>

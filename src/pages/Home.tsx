@@ -65,7 +65,7 @@ export function Home() {
 
       {featured.length > 0 && <>
         <div className="product-grid">
-          {featured.map((product, index) => <ProductCard key={product.id} product={product} whatsappNumber={settings.whatsapp_number} priority={index === 0} />)}
+          {featured.map((product, index) => <ProductCard key={product.id} product={product} priority={index === 0} />)}
         </div>
         <div className="section-foot"><Link className="button button-secondary" to="/shop">See the full collection <ArrowUpRight size={15} aria-hidden="true" /></Link></div>
       </>}
