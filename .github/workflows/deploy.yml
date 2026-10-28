@@ -1,0 +1,110 @@
+name: Deploy to Cloudflare Pages
+
+# Builds the site and publishes the built folder to Cloudflare Pages, so the
+# deployment never depends on dashboard build settings being correct.
+#
+# ⚠️ This workflow and Cloudflare's own Git integration must not both publish the
+# `deploy` branch to the same project: whichever finishes last wins, and a
+# misconfigured Git integration would overwrite a good deployment with the raw
+# repository. Choose one (see docs/DEPLOY.md). That is why this workflow is
+# manual by default — uncomment the `push` trigger only after disconnecting Git
+# in the Pages project.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   CLOUDFLARE_API_TOKEN   – API token scoped to "Cloudflare Pages: Edit"
+#   CLOUDFLARE_ACCOUNT_ID  – optional, a default is set below
+# Optional repository variable:
+#   PAGES_PROJECT          – project name, defaults to "purityskin"
+
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [deploy]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check for a Cloudflare API token
+        env:
+          TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error title=Cloudflare token missing::Add a repository secret CLOUDFLARE_API_TOKEN (Cloudflare Pages: Edit). See docs/DEPLOY.md."
+            exit 1
+          fi
+          echo "Token present."
+
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      - name: Use Node 22
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Quality gate
+        run: |
+          npm run lint
+          npm run typecheck
+          npm run test
+          npm run test:db
+
+      - name: Build and verify the artefact
+        run: |
+          npm run build
+          npm run check:build
+
+      - name: Publish to Cloudflare Pages
+        id: pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || 'd0ee64cee0bd3c218942332e7d563d8e' }}
+          command: >-
+            pages deploy dist
+            --project-name=${{ vars.PAGES_PROJECT || 'purityskin' }}
+            --branch=deploy
+            --commit-dirty=true
+
+      - name: Smoke test the deployment URL
+        env:
+          DEPLOY_URL: ${{ steps.pages.outputs.deployment-url }}
+        run: |
+          echo "Deployed: $DEPLOY_URL"
+          node scripts/smoke-deployed.mjs "$DEPLOY_URL"
+
+      - name: Smoke test the production domain
+        run: |
+          # The production alias can take a few seconds to switch over.
+          for attempt in 1 2 3 4 5 6; do
+            if node scripts/smoke-deployed.mjs "https://purityskin.pages.dev"; then exit 0; fi
+            echo "attempt $attempt failed, retrying in 20s"
+            sleep 20
+          done
+          echo "::error title=Production domain not updated::https://purityskin.pages.dev is still not serving the built site."
+          exit 1
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Cloudflare Pages deployment"
+            echo "| Item | Value |"
+            echo "| --- | --- |"
+            echo "| Commit | \`${{ github.sha }}\` |"
+            echo "| Deployment URL | ${{ steps.pages.outputs.deployment-url || 'not published' }} |"
+            echo "| Result | ${{ job.status }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

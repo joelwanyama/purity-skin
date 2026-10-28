@@ -101,19 +101,25 @@ GitHub CI (`.github/workflows/quality.yml`) checks every push to `main` and ever
 
 ### Cloudflare Pages
 
-The site is hosted on Cloudflare Pages from `joelwanyama/purity-skin` with **`deploy` as the production branch**: every push to `deploy` builds and publishes to the production URL, and pushes to other branches produce preview deployments. Cloudflare reports each attempt as a `Cloudflare Pages` check run on the commit.
+The site is hosted on Cloudflare Pages from `joelwanyama/purity-skin`, with **`deploy` as the production branch**: a push to `deploy` builds and publishes to the production URL, and other branches produce preview deployments.
+
+Two deployment paths are documented in `docs/DEPLOY.md` — fix the dashboard build settings, or deploy from `.github/workflows/deploy.yml`. Do not run both at once.
 
 The project's build settings must be:
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | Vite |
 | Build command | `npm run build` |
 | Build output directory | `dist` |
-| Root directory | `/` (repository root) |
-| Node version | `22` (pinned by `.nvmrc`) |
+| Root directory | *(empty = repository root)* |
+| Node version | `22` via `NODE_VERSION`, also pinned in `.nvmrc` |
 
-If the build command is empty or the output directory is left at the repository root, Cloudflare publishes the **unbuilt source** — the page loads `index.html`, whose `<script src="/src/main.tsx">` is served as raw TypeScript, and the app stays blank. That was the state of the first deploy.
+If the build command is empty or the output directory is left at the repository root, Cloudflare publishes the **unbuilt source**: the page loads `/src/main.tsx` as raw TypeScript and the app stays blank, while Cloudflare still reports the deploy as successful. That was the state of the first deploy; two guards now catch it:
+
+```sh
+npm run check:build                       # validates dist/ before publishing (inside npm run check and CI)
+npm run smoke -- https://purityskin.pages.dev   # validates the live site
+```
 
 `public/_redirects` provides the SPA fallback (`/* /index.html 200`) that Cloudflare Pages needs for client-side routes such as `/owner`, and `public/_headers` sets cache rules (fingerprinted assets immutable, `sw.js` uncached). Both files must be in the build output, which is why they live in `public/`.
 

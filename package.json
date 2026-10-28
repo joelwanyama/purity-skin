@@ -6,13 +6,15 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "check:build": "node scripts/check-build.mjs dist",
+    "smoke": "node scripts/smoke-deployed.mjs",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b",
     "test:e2e": "playwright test",
-    "check": "npm run lint && npm run typecheck && npm run test && npm run test:db && npm run test:e2e && npm run build && npm audit --audit-level=low",
+    "check": "npm run lint && npm run typecheck && npm run test && npm run test:db && npm run test:e2e && npm run build && npm run check:build && npm audit --audit-level=low",
     "test:db": "node scripts/test-db.mjs",
     "assets": "node scripts/build-brand-assets.mjs"
   },
