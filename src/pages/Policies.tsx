@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useShopCatalog } from '../catalog/useShopCatalog'
+import { analyticsEnabled } from '../lib/analytics'
 import { usePageMeta } from '../lib/pageMeta'
 
 export function Policies() {
@@ -56,6 +57,18 @@ export function Policies() {
         </ul>
       </section>
 
+      <section className="info-block" id="pack-record" aria-labelledby="pack-record-title">
+        <h2 id="pack-record-title">What "what we checked on the pack" means</h2>
+        <ul className="plain-list">
+          <li>Some product pages show a short list: the UNBS Q-Mark, the manufacturer, the batch or lot code and the expiry month.</li>
+          <li>Every one of those lines was read off the physical pack by PURITY SKIN and confirmed on the date printed beside it. Nothing on that list is copied from a wholesaler's website or filled in automatically.</li>
+          <li>It is a record, not a certification. This website is not UNBS and cannot certify anything; it only repeats what was verified on the pack you are being sold.</li>
+          <li>If a field is not shown, it is because it has not been verified — not because the product failed a test. Ask us in the chat and we will tell you what we can check.</li>
+          <li>UNBS asks cosmetics buyers to look for the Q-Mark on the pack. When we have seen it we say so; when we have not seen it we say nothing at all rather than imply it.</li>
+          <li>Always check the expiry date and batch on the pack when your order arrives, and tell us the same day if anything does not match.</li>
+        </ul>
+      </section>
+
       <section className="info-block" id="privacy" aria-labelledby="privacy-title">
         <h2 id="privacy-title">Privacy and your details</h2>
         <ul className="plain-list">
@@ -65,6 +78,15 @@ export function Policies() {
           <li>The catalogue editor on this site saves drafts in your own browser. It sends nothing anywhere.</li>
           <li>Ask us to delete your details and we will, unless we must keep a record of a completed sale.</li>
         </ul>
+        <h3 className="info-subhead">Counting visits</h3>
+        {analyticsEnabled
+          ? <ul className="plain-list">
+              <li>This shop counts visits with Cloudflare Web Analytics: a cookie-free service that reports daily totals and which page was opened. It sets no cookie, stores no identifier on your device and does not follow you to other sites.</li>
+              <li>We see numbers — how many people opened the shop, which products were viewed — never who you are, and we cannot single anyone out.</li>
+              <li>There is no advertising pixel, no social tracker and no profile of you. Nothing about your visit is sold or shared for marketing.</li>
+              <li>Enquiries are not counted by the website at all. They reach us as WhatsApp messages, which is also the record we keep.</li>
+            </ul>
+          : <p>This shop does not run analytics, advertising pixels or cross-site trackers, and sets no cookies of its own. If aggregate visit counting is ever switched on it will be cookie-free and anonymous, it will be described here in plain words, and it will never identify a person.</p>}
       </section>
 
       <section className="info-block" id="accessibility" aria-labelledby="accessibility-title">

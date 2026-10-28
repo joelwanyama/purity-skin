@@ -23,6 +23,7 @@ import { ProductDetail } from './pages/ProductDetail'
 import { Products } from './pages/Products'
 import { Shop } from './pages/Shop'
 import { Studio } from './pages/Studio'
+import { Ledger } from './pages/Ledger'
 import './index.css'
 
 function ScrollToTop() {
@@ -50,6 +51,7 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/policies" element={<Policies />} />
       <Route path="/studio/catalogue" element={<Studio />} />
+      <Route path="/studio/ledger" element={<Ledger />} />
       <Route path="*" element={<NotFound />} />
     </Route>
     <Route path="/owner/reset-password" element={<OwnerResetPassword />} />

@@ -1,10 +1,11 @@
-import { ArrowLeft, Check, MessageCircle, PackageCheck, Plus, ShieldQuestion, Truck } from 'lucide-react'
+import { ArrowLeft, BadgeCheck, Check, MessageCircle, PackageCheck, Plus, ShieldQuestion, Truck } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { ProductPhoto } from '../components/ProductPhoto'
 import { findPublishedBySlug, publishedProducts } from '../catalog/storage'
 import { useShopCatalog } from '../catalog/useShopCatalog'
 import { useEnquiry } from '../order/useEnquiry'
 import { formatUGX, whatsappHref } from '../lib/format'
+import { customerFacingCompliance, formatConfirmedDate, lastConfirmedOn } from '../lib/compliance'
 import { usePageMeta } from '../lib/pageMeta'
 
 export function ProductDetail() {
@@ -43,6 +44,9 @@ export function ProductDetail() {
 
   const enquire = whatsappHref(settings.whatsapp_number, `Hello PURITY SKIN, I would like to ask about ${product.name}${product.size_label ? ` (${product.size_label})` : ''}.`)
   const related = publishedProducts(products).filter((item) => item.id !== product.id).slice(0, 3)
+  // Only what the owner recorded, confirmed and chose to publish — see lib/compliance.ts.
+  const packChecks = customerFacingCompliance(product)
+  const confirmedOn = lastConfirmedOn(product)
   const inList = quantityOf(product.id)
 
   return <div className="page">
@@ -84,6 +88,17 @@ export function ProductDetail() {
           <div><dt><PackageCheck size={15} aria-hidden="true" /> Availability</dt><dd>Confirmed by a real person before payment.</dd></div>
           <div><dt><ShieldQuestion size={15} aria-hidden="true" /> Suitability</dt><dd>Tell us about sensitive skin, allergies or current treatment in the chat.</dd></div>
         </dl>
+
+        {packChecks.length > 0 && <section className="detail-checks" aria-labelledby="pack-checks-title">
+          <h2 id="pack-checks-title"><BadgeCheck size={16} aria-hidden="true" /> What we checked on the pack</h2>
+          <dl>
+            {packChecks.map((row) => <div key={row.key}><dt>{row.label}</dt><dd>{row.value}</dd></div>)}
+          </dl>
+          <p className="detail-fineprint">
+            {confirmedOn ? `Read off the pack and confirmed by us on ${formatConfirmedDate(confirmedOn)}. ` : ''}
+            This is a record of what is printed on the pack — not a certification by this website, and no guarantee that a future batch is identical. <Link to="/policies#pack-record">What this means</Link>.
+          </p>
+        </section>}
 
         <p className="detail-disclaimer">If you have a skin condition, are pregnant or are using prescription treatment, speak to a qualified health professional before starting a new product.</p>
       </div>

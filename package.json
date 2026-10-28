@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/postbuild.mjs",
+    "build": "node scripts/build-photo-variants.mjs && node scripts/export-status-cards.mjs && tsc -b && vite build && node scripts/prerender.mjs && node scripts/postbuild.mjs",
     "check:build": "node scripts/check-build.mjs dist",
     "smoke": "node scripts/smoke-deployed.mjs",
     "lint": "oxlint",
@@ -18,7 +18,11 @@
     "test:db": "node scripts/test-db.mjs",
     "assets": "node scripts/build-brand-assets.mjs",
     "publish:build": "npm run build && npm run check:build && git add -f dist && git commit -m \"Refresh built site output\" || echo \"Nothing to publish: dist is already current.\"",
-    "export:whatsapp": "node scripts/export-whatsapp-catalog.mjs"
+    "export:whatsapp": "node scripts/export-whatsapp-catalog.mjs",
+    "export:cards": "node scripts/export-status-cards.mjs",
+    "photos": "node scripts/build-photo-variants.mjs",
+    "preview:share": "node scripts/check-share-preview.mjs",
+    "guide": "node scripts/build-owner-guide.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",

@@ -11,6 +11,7 @@ const base = (process.argv[2] ?? 'https://purityskin.pages.dev').replace(/\/+$/,
 
 const problems = []
 const results = []
+const notes = []
 
 async function get(pathname) {
   const response = await fetch(`${base}${pathname}`, { redirect: 'follow' })
@@ -21,6 +22,12 @@ async function get(pathname) {
 function check(label, ok, detail) {
   results.push({ label, ok, detail })
   if (!ok) problems.push(`${label}: ${detail}`)
+}
+
+/** Something worth telling the owner about that is not a deployment failure. */
+function note(message) {
+  notes.push(message)
+  results.push({ label: message, ok: true, detail: '' })
 }
 
 try {
@@ -52,8 +59,45 @@ try {
   const sw = await get('/sw.js')
   check('/sw.js is served as the worker', sw.body.trimStart().startsWith('const CACHE'), 'response does not look like the service worker file')
 
+  // /shop is prerendered: it must serve real HTML metadata, not just the shell.
   const deep = await get('/shop')
-  check('/shop uses the SPA fallback', deep.status === 200 && /<div id="root">/.test(deep.body), `status ${deep.status}`)
+  check('/shop responds 200 with the app shell', deep.status === 200 && /<div id="root">/.test(deep.body), `status ${deep.status}`)
+  check(
+    '/shop carries its own title and canonical URL',
+    /<title>[^<]*Shop the collection[^<]*<\/title>/.test(deep.body) &&
+      /<link rel="canonical" href="https:\/\/[^"]+\/shop" \/>/.test(deep.body),
+    'the prerendered shop page is missing its title or canonical link',
+  )
+
+  // One static page per published product, so a share link previews correctly.
+  const manifest = await get('/prerender.json')
+  let prerendered = { products: [] }
+  try {
+    prerendered = JSON.parse(manifest.body)
+  } catch {
+    check('/prerender.json is valid JSON', false, `status ${manifest.status}`)
+  }
+  const productSlugs = Array.isArray(prerendered.products) ? prerendered.products : []
+  if (productSlugs.length === 0) {
+    note('no published products yet, so there are no product share pages to check')
+  }
+  for (const slug of productSlugs) {
+    const page = await get(`/shop/${slug}`)
+    check(`/shop/${slug} responds 200 as HTML`, page.status === 200 && /text\/html/.test(page.type), `status ${page.status}`)
+    check(
+      `/shop/${slug} prerendered its own metadata`,
+      page.body.includes(`/shop/${slug}"`) && /<meta property="og:title" content="[^"]+"/.test(page.body),
+      'the product page is serving the generic shell, so shared links would show the wrong preview',
+    )
+    check(
+      `/shop/${slug} keeps the app shell for real visitors`,
+      /<div id="root">/.test(page.body) && /<script[^>]+src="\/assets\/[^"]+\.js"/.test(page.body),
+      'the page is missing the app shell or the built bundle',
+    )
+    const card = await get(`/downloads/cards/${slug}.png`)
+    if (card.status === 200) check(`/downloads/cards/${slug}.png is a real PNG`, card.type.includes('image/png'), `content-type ${card.type}`)
+    else note(`no Status card published for "${slug}" yet`)
+  }
 
   const og = await fetch(`${base}/og.png`)
   const ogBytes = new Uint8Array(await og.arrayBuffer())
@@ -98,5 +142,7 @@ if (problems.length) {
   console.error('Or deploy from GitHub Actions: .github/workflows/deploy.yml (see docs/DEPLOY.md).')
   process.exit(1)
 }
+
+for (const message of notes) console.log(`  · ${message}`)
 
 console.log(`\nDeployment smoke test passed for ${base}`)

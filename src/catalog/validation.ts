@@ -1,4 +1,4 @@
-import type { CatalogFile, CatalogProduct, CatalogSettings } from './types'
+import type { CatalogFile, CatalogProduct, CatalogSettings, ComplianceField, ProductCompliance } from './types'
 
 export type ValidationResult = { errors: string[]; warnings: string[] }
 
@@ -133,6 +133,37 @@ function asIsoDate(value: unknown): string {
   return new Date().toISOString()
 }
 
+const COMPLIANCE_KEYS = ['qmark_status', 'manufacturer', 'batch_lot', 'expiry'] as const
+
+function asNullableDate(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() && !Number.isNaN(Date.parse(value)) ? value : null
+}
+
+/**
+ * Compliance values are never invented or defaulted: an unreadable field comes
+ * back empty, which is exactly the "not recorded" state the dashboard shows.
+ */
+export function normalizeCompliance(value: unknown): ProductCompliance | undefined {
+  if (!isRecord(value)) return undefined
+  const field = (key: string): ComplianceField => {
+    const raw = value[key]
+    const record = isRecord(raw) ? raw : {}
+    const text = asString(record.value).trim()
+    const confirmed = text ? asNullableDate(record.confirmed_on) : null
+    return { value: text, confirmed_on: confirmed }
+  }
+  // A catalogue with no compliance keys at all stays without the field, so its
+  // JSON round-trips byte-for-byte and product pages render exactly as before.
+  if (!COMPLIANCE_KEYS.some((key) => isRecord(value[key]))) return undefined
+  return {
+    qmark_status: field('qmark_status'),
+    manufacturer: field('manufacturer'),
+    batch_lot: field('batch_lot'),
+    expiry: field('expiry'),
+    show_to_customers: asBoolean(value.show_to_customers),
+  }
+}
+
 function normalizeProduct(value: unknown, index: number, errors: string[]): CatalogProduct | null {
   if (!isRecord(value)) {
     errors.push(`Product ${index + 1}: not an object.`)
@@ -166,6 +197,8 @@ function normalizeProduct(value: unknown, index: number, errors: string[]): Cata
     created_at: asIsoDate(value.created_at),
     updated_at: asIsoDate(value.updated_at),
   }
+  const compliance = normalizeCompliance(value.compliance)
+  if (compliance) product.compliance = compliance
 
   if (status === 'published') {
     const gate = validateProductForPublish(product)

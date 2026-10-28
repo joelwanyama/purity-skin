@@ -4,6 +4,8 @@ import {
   Plus, RotateCcw, Trash2, Upload,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
+import { ComplianceEditor } from '../components/ComplianceEditor'
+import { ComplianceNotes } from '../components/ComplianceNotes'
 import { ProductCard } from '../components/ProductCard'
 import { useShopCatalog } from '../catalog/useShopCatalog'
 import {
@@ -138,6 +140,16 @@ export function Studio() {
 
     {note && <p className={`studio-note studio-note-${note.tone}`} role="status">{note.text}</p>}
 
+    <div>
+      <ComplianceNotes
+        products={draftProducts}
+        onSelect={(id) => {
+          setSelectedId(id)
+          document.getElementById('editor-title')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }}
+      />
+    </div>
+
     <div className="studio-toolbar">
       <button type="button" className="button button-primary" onClick={addProduct}><Plus size={16} aria-hidden="true" /> New product</button>
       <button type="button" className="button button-secondary" onClick={exportJson}><Download size={16} aria-hidden="true" /> Download JSON</button>
@@ -265,6 +277,11 @@ export function Studio() {
                 <small>{selected.description.trim().length}/40 characters minimum</small>
               </label>
 
+              <ComplianceEditor
+                product={selected}
+                onChange={(compliance) => updateProduct({ compliance })}
+              />
+
               <div className="gate-block">
                 <p className="gate-title">Publish checks</p>
                 <label className="toggle-row">
@@ -327,6 +344,6 @@ export function Studio() {
       </div>
     </section>
 
-    <p className="studio-foot">Prefer a standalone file? Download <a href="/downloads/purity-skin-catalogue-builder.html" download>the offline catalogue builder</a> — same fields, exports a ZIP with the JSON and photos. Committed catalogue: {committedCatalog().products.length} products · documentation in <code className="inline-code">docs/CATALOGUE.md</code> · photo specification in <code className="inline-code">docs/ASSETS.md</code> · <Link to="/shop">view the public shop</Link></p>
+    <p className="studio-foot">Keeping track of enquiries? Open the <Link to="/studio/ledger">order ledger</Link> — a private list that stays in this browser. The phone-sized instructions are the <a href="/downloads/purity-skin-owner-guide.pdf" download>owner guide (PDF)</a>. Prefer a standalone file? Download <a href="/downloads/purity-skin-catalogue-builder.html" download>the offline catalogue builder</a> — same fields, exports a ZIP with the JSON and photos. Committed catalogue: {committedCatalog().products.length} products · documentation in <code className="inline-code">docs/CATALOGUE.md</code> · photo specification in <code className="inline-code">docs/ASSETS.md</code> · <Link to="/shop">view the public shop</Link></p>
   </div>
 }

@@ -97,7 +97,94 @@ const sw = await read('sw.js')
 if (!/purity-static-v\d+/.test(sw)) fail('sw.js has no versioned cache name.')
 if (!/\/rest\/|\/auth\//.test(sw)) fail('sw.js does not exclude API/auth paths from caching.')
 
-// 7. The build should describe the same site that is deployed.
+// 7. Every published product needs its own static page, because crawlers and
+//    link unfurlers never run the app. This is what makes a shared link preview.
+let catalogue = { products: [] }
+try {
+  catalogue = JSON.parse(await readFile(path.resolve('src/catalog/catalog.data.json'), 'utf8'))
+} catch {
+  fail('src/catalog/catalog.data.json could not be read; the shop cannot be checked against it.')
+}
+const published = (catalogue.products ?? []).filter(
+  (product) => product && product.status === 'published' && String(product.slug ?? '').trim() && String(product.name ?? '').trim(),
+)
+
+if (!(await exists('shop/index.html'))) {
+  fail('Missing prerendered shop page: shop/index.html. Run `npm run build` (it runs scripts/prerender.mjs).')
+}
+
+let prerendered = { products: [] }
+try {
+  prerendered = JSON.parse(await read('prerender.json', { required: false }) || '{}')
+} catch {
+  fail('prerender.json is not valid JSON.')
+}
+
+for (const product of published) {
+  const slug = String(product.slug).trim()
+  const page = await read(`shop/${slug}/index.html`, { required: false })
+  if (!page) {
+    fail(`Published product "${slug}" has no static page at shop/${slug}/index.html; its link preview would be blank.`)
+    continue
+  }
+  if (!page.includes(`<link rel="canonical" href="`) || !page.includes(`/shop/${slug}"`)) {
+    fail(`shop/${slug}/index.html does not declare its own canonical URL.`)
+  }
+  if (!page.includes(`property="og:title"`)) fail(`shop/${slug}/index.html has no og:title.`)
+  if (!(page.includes('application/ld+json') || page.includes('Price confirmed on WhatsApp'))) {
+    fail(`shop/${slug}/index.html carries neither structured data nor the "price confirmed" wording.`)
+  }
+  if (!(prerendered.products ?? []).includes(slug)) {
+    fail(`prerender.json does not list "${slug}", so the smoke test cannot check it.`)
+  }
+}
+
+for (const slug of prerendered.products ?? []) {
+  if (!published.some((product) => String(product.slug).trim() === slug)) {
+    fail(`shop/${slug}/index.html was prerendered for a product that is not published. Delete the stale page and rebuild.`)
+  }
+}
+
+// 8. Photos must ship in every size the page advertises, and the manifest the
+//    app imports must match what is actually on disk.
+let photoVariants = {}
+try {
+  photoVariants = JSON.parse(await readFile(path.resolve('src/catalog/photo-variants.json'), 'utf8'))
+} catch {
+  notes.push('src/catalog/photo-variants.json is missing; product photos will load at full size.')
+}
+for (const product of published) {
+  const imagePath = typeof product.image_path === 'string' ? product.image_path : ''
+  if (!imagePath.startsWith('/images/products/')) continue
+  const relative = imagePath.replace(/^\/+/, '')
+  if (!(await exists(relative))) {
+    fail(`Products photo "${imagePath}" is referenced by "${product.slug}" but is not in the build output.`)
+    continue
+  }
+  const variant = photoVariants[imagePath]
+  if (!variant) {
+    fail(`Photo "${imagePath}" has no entry in src/catalog/photo-variants.json. Run \`npm run photos\`.`)
+    continue
+  }
+  for (const key of ['card', 'share']) {
+    const file = String(variant[key] ?? '').replace(/^\/+/, '')
+    if (!file || !(await exists(file))) fail(`Photo "${imagePath}" is missing its ${key} variant (${variant[key] ?? 'not declared'}).`)
+  }
+  if (!(Number(variant.width) > 0) || !(Number(variant.height) > 0)) {
+    fail(`Photo "${imagePath}" has no measured width/height in photo-variants.json; the page would reserve the wrong space.`)
+  }
+}
+
+// 9. Status cards, when they exist, must match a live product.
+for (const product of published) {
+  const slug = String(product.slug).trim()
+  if (!product.price_ugx) continue
+  if (!(await exists(`downloads/cards/${slug}.png`))) {
+    notes.push(`No Status card for "${slug}" yet. Run \`npm run export:cards\`. The owner dashboard links only cards that exist.`)
+  }
+}
+
+// 10. The build should describe the same site that is deployed.
 let wrangler = null
 try {
   wrangler = (await exists('wrangler.json')) ? JSON.parse(await read('wrangler.json')) : null

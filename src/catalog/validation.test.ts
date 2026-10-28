@@ -105,6 +105,51 @@ describe('catalogue import safety', () => {
     expect(result.warnings.join(' ')).toMatch(/Duplicate link/)
   })
 
+  it('carries the pack record through an import, keeping unconfirmed values unconfirmed', () => {
+    const result = parseCatalog(file([{
+      ...product(),
+      status: 'published',
+      compliance: {
+        qmark_status: { value: 'verified', confirmed_on: '2026-10-20T00:00:00.000Z' },
+        manufacturer: { value: 'Kampala Cosmetics Ltd', confirmed_on: '2026-10-20T00:00:00.000Z' },
+        batch_lot: { value: 'B-2291', confirmed_on: null },
+        expiry: { value: '2027-04', confirmed_on: '2026-10-20T00:00:00.000Z' },
+        show_to_customers: true,
+      },
+    }]))
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const compliance = result.catalog.products[0].compliance
+    expect(compliance?.manufacturer).toEqual({ value: 'Kampala Cosmetics Ltd', confirmed_on: '2026-10-20T00:00:00.000Z' })
+    expect(compliance?.batch_lot.confirmed_on).toBeNull()
+    expect(compliance?.show_to_customers).toBe(true)
+  })
+
+  it('never invents a confirmation, even when the JSON claims one on an empty value', () => {
+    const result = parseCatalog(file([{
+      ...product(),
+      compliance: {
+        qmark_status: { value: '', confirmed_on: '2026-10-20T00:00:00.000Z' },
+        manufacturer: { value: '  ', confirmed_on: '2026-10-20T00:00:00.000Z' },
+        expiry: { value: '2027-04', confirmed_on: 'not a date' },
+      },
+    }]))
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    const compliance = result.catalog.products[0].compliance
+    expect(compliance?.qmark_status).toEqual({ value: '', confirmed_on: null })
+    expect(compliance?.manufacturer).toEqual({ value: '', confirmed_on: null })
+    expect(compliance?.expiry).toEqual({ value: '2027-04', confirmed_on: null })
+    expect(compliance?.show_to_customers).toBe(false)
+  })
+
+  it('leaves a catalogue written before the pack record existed exactly as it was', () => {
+    const result = parseCatalog(file([{ ...product(), status: 'published' }]))
+    expect(result.ok).toBe(true)
+    if (!result.ok) return
+    expect(result.catalog.products[0].compliance).toBeUndefined()
+  })
+
   it('normalises loose field types from hand-edited JSON', () => {
     const result = parseCatalog(file([{ name: 'Toner', price_ugx: '15000', status: 'live' }]))
     expect(result.ok).toBe(true)

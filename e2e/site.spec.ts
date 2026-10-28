@@ -101,7 +101,7 @@ test('the catalogue studio is usable and kept out of search results', async ({ p
   await expect(page.getByRole('img', { name: /photo slot for barrier serum/i })).toBeVisible()
 })
 
-for (const path of ['/', '/shop', '/how-to-order', '/policies', '/studio/catalogue']) {
+for (const path of ['/', '/shop', '/how-to-order', '/policies', '/studio/catalogue', '/studio/ledger']) {
   test(`no serious or critical accessibility violations on ${path}`, async ({ page }) => {
     await page.goto(path)
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze()

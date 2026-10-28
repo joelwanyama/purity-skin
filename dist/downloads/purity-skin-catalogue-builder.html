@@ -93,7 +93,25 @@
 
   /* ---------- panels ---------- */
   .panel{border:1px solid var(--line);border-radius:var(--radius);background:var(--surface);padding:18px;margin-bottom:16px}
-  .panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+  .notes-panel{border-left:3px solid var(--accent)}
+.notes-note{display:grid;grid-template-columns:14px minmax(0,1fr);gap:9px;padding:9px 0;border-top:1px solid var(--line);font-size:12px;line-height:1.5;color:var(--muted)}
+.notes-note:first-child{border-top:0}
+.notes-note b{display:block;color:var(--ink);font-size:12px}
+.notes-note small{display:block;color:var(--muted);font-size:11.5px;line-height:1.55}
+.notes-note .dot{width:6px;height:6px;margin-top:5px;border-radius:50%;border:1px solid var(--muted)}
+.notes-note.warn .dot{background:var(--bad);border-color:var(--bad)}
+.notes-note.warn b{color:var(--bad)}
+.notes-product{display:flex;align-items:center;gap:9px;margin:14px 0 4px}
+.notes-product:first-child{margin-top:0}
+.notes-product b{font-size:12.5px;color:var(--ink)}
+.notes-product button{background:none;border:0;padding:0;color:var(--accent-soft);font:600 12.5px var(--font);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.notes-list{list-style:none;margin:0;padding:0}
+.pack-hint{margin:0 0 10px;color:var(--muted);font-size:11.5px;line-height:1.55}
+.confirm-line{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin:3px 0 10px;font-size:11px;line-height:1.5;color:var(--muted)}
+.confirm-line.ok{color:var(--ok)}
+.confirm-line.todo{color:var(--accent-soft)}
+.confirm-line button{background:none;border:0;padding:0;color:inherit;font:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
   .panel-head .title{display:flex;align-items:center;gap:10px;min-width:0}
   .step-badge{width:26px;height:26px;flex:none;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;background:var(--raised);color:var(--accent);font:600 10px var(--mono)}
   .panel-head small{color:var(--faint);font-size:11px}
@@ -336,6 +354,22 @@
     </div>
   </section>
 
+  <!-- 01b · Important notes (pack records) -->
+  <section class="panel notes-panel" id="notes-panel" aria-labelledby="notes-title">
+    <div class="panel-head" style="margin-bottom:10px">
+      <div class="title">
+        <span class="step-badge" aria-hidden="true">!</span>
+        <div><h2 id="notes-title">Important notes</h2><small id="notes-count">Nothing to report</small></div>
+      </div>
+    </div>
+    <p class="pack-hint">
+      Pack records for UNBS and PDPO purposes. Owner-only: a value reaches the product page only when you record it,
+      confirm you read it off the pack, and switch display on for that product. Nothing here is ever guessed.
+    </p>
+    <ul class="notes-list" id="notes-list"></ul>
+    <p class="faint" id="notes-empty" style="font-size:11px;margin:0" hidden>Every product has a complete pack record. Nothing is waiting on you.</p>
+  </section>
+
   <!-- 02 · Products -->
   <div class="shell" id="step-products">
     <div class="rail">
@@ -455,6 +489,38 @@
               <p class="meta" id="photo-meta">No photo attached. The shop shows a designed photo slot instead of a wrong picture.</p>
             </div>
           </div>
+        </div>
+
+        <div class="group">
+          <p class="group-title">Pack record <span>Owner only · optional</span></p>
+          <p class="pack-hint" id="pack-summary">Nothing recorded yet.</p>
+          <div class="form-two">
+            <label class="field">UNBS Q-Mark
+              <select id="p-qmark">
+                <option value="">Not recorded</option>
+                <option value="verified">Seen on the pack</option>
+                <option value="not_applicable">Not applicable to this product</option>
+                <option value="unverified">Not found on the pack</option>
+              </select>
+              <small class="confirm-line" id="qmark-confirm-line"></small>
+            </label>
+            <label class="field">Expiry (as printed)
+              <input id="p-expiry" type="month" />
+              <small class="confirm-line" id="expiry-confirm-line"></small>
+            </label>
+          </div>
+          <label class="field">Manufacturer or licence holder
+            <input id="p-manufacturer" type="text" maxlength="80" placeholder="Exactly as printed on the pack" />
+            <small class="confirm-line" id="manufacturer-confirm-line"></small>
+          </label>
+          <label class="field">Batch or lot code
+            <input id="p-batch" type="text" maxlength="80" placeholder="As printed next to the expiry" />
+            <small class="confirm-line" id="batch-confirm-line"></small>
+          </label>
+          <label class="toggle" style="margin-top:10px">
+            <input id="p-show-pack" type="checkbox" />
+            <span><b>Show my confirmed pack details to customers</b><small id="show-pack-hint">Confirm at least one field first. Until then nothing about the pack reaches the shop.</small></span>
+          </label>
         </div>
 
         <div class="group">
@@ -749,6 +815,236 @@
     }
   }
 
+  /* ---------------- pack record (UNBS / PDPO) ---------------- */
+
+  var PACK_FIELDS = [
+    { key: 'qmark_status', input: 'p-qmark', confirm: 'qmark-confirm-line', label: 'UNBS Q-Mark' },
+    { key: 'manufacturer', input: 'p-manufacturer', confirm: 'manufacturer-confirm-line', label: 'Manufacturer' },
+    { key: 'batch_lot', input: 'p-batch', confirm: 'batch-confirm-line', label: 'Batch / lot' },
+    { key: 'expiry', input: 'p-expiry', confirm: 'expiry-confirm-line', label: 'Expiry' }
+  ];
+
+  function emptyCompliance() {
+    return {
+      qmark_status: { value: '', confirmed_on: null },
+      manufacturer: { value: '', confirmed_on: null },
+      batch_lot: { value: '', confirmed_on: null },
+      expiry: { value: '', confirmed_on: null },
+      show_to_customers: false
+    };
+  }
+
+  /** Never invents a value: anything unreadable becomes "not recorded". */
+  function normalizeCompliance(raw) {
+    var record = raw && typeof raw === 'object' ? raw : {};
+    var out = emptyCompliance();
+    PACK_FIELDS.forEach(function (field) {
+      var entry = record[field.key] && typeof record[field.key] === 'object' ? record[field.key] : {};
+      var value = typeof entry.value === 'string' ? entry.value.trim() : '';
+      var confirmed = typeof entry.confirmed_on === 'string' && entry.confirmed_on && !isNaN(Date.parse(entry.confirmed_on))
+        ? entry.confirmed_on
+        : null;
+      out[field.key] = { value: value, confirmed_on: value ? confirmed : null };
+    });
+    out.show_to_customers = record.show_to_customers === true;
+    return out;
+  }
+
+  function packOf(p) {
+    if (!p.compliance) p.compliance = emptyCompliance();
+    return p.compliance;
+  }
+
+  function confirmedCount(p) {
+    var c = packOf(p);
+    return PACK_FIELDS.filter(function (field) { return c[field.key].value && c[field.key].confirmed_on; }).length;
+  }
+
+  function recordedCount(p) {
+    var c = packOf(p);
+    return PACK_FIELDS.filter(function (field) { return Boolean(c[field.key].value); }).length;
+  }
+
+  /** What a customer would see: confirmed, display on, and never "not found". */
+  function customerRows(p) {
+    var c = p.compliance;
+    if (!c || c.show_to_customers !== true) return [];
+    return PACK_FIELDS.filter(function (field) {
+      var entry = c[field.key];
+      if (!entry || !entry.value || !entry.confirmed_on) return false;
+      if (field.key === 'qmark_status') return entry.value === 'verified' || entry.value === 'not_applicable';
+      if (field.key === 'expiry') {
+        var match = /^(\d{4})-(\d{2})$/.exec(entry.value);
+        if (!match) return false;
+        var end = new Date(Date.UTC(Number(match[1]), Number(match[2]), 1));
+        end.setUTCDate(end.getUTCDate() - 1);
+        return end >= new Date();
+      }
+      return true;
+    }).map(function (field) { return { label: field.label, value: c[field.key].value }; });
+  }
+
+  /** Owner-facing gaps, most urgent first. */
+  function packNotes(p) {
+    var c = packOf(p);
+    var notes = [];
+    PACK_FIELDS.forEach(function (field) {
+      var entry = c[field.key];
+      var value = entry.value;
+      var confirmed = entry.confirmed_on;
+      if (field.key === 'qmark_status' && value === 'unverified') {
+        notes.push({ level: 'warn', title: 'Q-Mark not found on the pack', detail: 'The shop will never call this product Q-Mark certified. Ask your supplier in writing before you keep selling it.' });
+        return;
+      }
+      if (value && !confirmed) {
+        notes.push({ level: 'todo', title: field.label + ' is recorded but not confirmed', detail: 'It stays hidden from customers until you confirm you read it off the pack.' });
+        return;
+      }
+      if (!value) {
+        notes.push({
+          level: 'todo',
+          title: field.label + ' not recorded',
+          detail: field.key === 'qmark_status'
+            ? 'Look for the Q-Mark and pick what you see. "Not found" is a valid answer and it is never shown to customers.'
+            : 'Optional. If you record it and confirm it, customers see exactly what you read — nothing more.'
+        });
+        return;
+      }
+      if (field.key === 'expiry') {
+        var match = /^(\d{4})-(\d{2})$/.exec(value);
+        if (match) {
+          var end = new Date(Date.UTC(Number(match[1]), Number(match[2]), 1));
+          end.setUTCDate(end.getUTCDate() - 1);
+          if (end < new Date()) {
+            notes.push({ level: 'warn', title: 'Expiry date has passed', detail: 'Check the batch you actually have before you publish or sell this product.' });
+          }
+        }
+      }
+    });
+    if (!c.show_to_customers && confirmedCount(p) > 0) {
+      notes.push({ level: 'todo', title: 'Confirmed details are hidden from customers', detail: 'You confirmed at least one field. Switch customer display on when you are ready for the product page to show it.' });
+    }
+    return notes;
+  }
+
+  function renderNotes() {
+    var list = el('notes-list');
+    var empty = el('notes-empty');
+    var count = el('notes-count');
+    if (!list) return;
+    list.innerHTML = '';
+    var pending = 0;
+    var warnings = 0;
+    var rows = state.products.map(function (p) { return { product: p, notes: packNotes(p) }; })
+      .filter(function (row) { return row.notes.length > 0; });
+
+    rows.forEach(function (row) {
+      pending += 1;
+      warnings += row.notes.filter(function (note) { return note.level === 'warn'; }).length;
+      var li = document.createElement('li');
+      var head = document.createElement('div');
+      head.className = 'notes-product';
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = row.product.name || 'Untitled product';
+      button.addEventListener('click', function () {
+        selectProduct(row.product.id);
+        el('editor-panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      var chip = document.createElement('span');
+      chip.className = 'chip' + (row.product.status === 'published' ? ' pub' : '');
+      chip.textContent = row.product.status === 'published' ? 'Published' : 'Draft';
+      head.appendChild(button);
+      head.appendChild(chip);
+      li.appendChild(head);
+
+      row.notes.forEach(function (note) {
+        var noteEl = document.createElement('p');
+        noteEl.className = 'notes-note' + (note.level === 'warn' ? ' warn' : '');
+        noteEl.innerHTML = '<span class="dot" aria-hidden="true"></span><span><b>' + escapeHtml(note.title) + '</b><small>' + escapeHtml(note.detail) + '</small></span>';
+        li.appendChild(noteEl);
+      });
+      list.appendChild(li);
+    });
+
+    if (count) {
+      count.textContent = state.products.length === 0
+        ? 'No products yet'
+        : rows.length === 0
+          ? 'All records complete'
+          : warnings
+            ? warnings + ' to fix'
+            : rows.length + ' product' + (rows.length === 1 ? '' : 's') + ' to fill in';
+    }
+    if (empty) empty.hidden = !(state.products.length > 0 && rows.length === 0);
+  }
+
+  function renderPackRecord(p) {
+    var c = packOf(p);
+    PACK_FIELDS.forEach(function (field) {
+      var input = el(field.input);
+      var line = el(field.confirm);
+      var entry = c[field.key];
+      if (input) input.value = entry.value;
+      if (!line) return;
+      line.innerHTML = '';
+      line.className = 'confirm-line';
+      if (!entry.value) {
+        line.classList.add('meta');
+        line.textContent = 'Not recorded — customers see nothing for this line.';
+        return;
+      }
+      if (entry.confirmed_on) {
+        line.classList.add('ok');
+        line.textContent = 'Confirmed from the pack on ' + formatDate(entry.confirmed_on) + ' · ';
+      } else {
+        line.classList.add('todo');
+        line.textContent = 'Recorded, not confirmed — hidden from customers. ';
+      }
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = entry.confirmed_on ? 'undo' : 'I checked this on the pack';
+      button.addEventListener('click', function () {
+        var next = normalizeCompliance(c);
+        next[field.key].confirmed_on = next[field.key].confirmed_on ? null : nowIso();
+        if (!next[field.key].confirmed_on) next.show_to_customers = false;
+        updateSelected({ compliance: next });
+        renderPackRecord(selected());
+      });
+      line.appendChild(button);
+    });
+
+    var toggle = el('p-show-pack');
+    var hint = el('show-pack-hint');
+    var confirmed = confirmedCount(p);
+    if (toggle) {
+      toggle.checked = confirmed > 0 && c.show_to_customers;
+      toggle.disabled = confirmed === 0;
+    }
+    if (hint) {
+      var rows = customerRows(p);
+      hint.textContent = confirmed === 0
+        ? 'Confirm at least one field first. Until then nothing about the pack reaches the shop.'
+        : !c.show_to_customers
+          ? confirmed + ' of 4 confirmed, currently hidden. Switch this on when you want the product page to show them.'
+          : rows.length
+            ? 'Showing ' + rows.map(function (row) { return row.label.toLowerCase(); }).join(', ') + ' on the product page.'
+            : 'On, but nothing is safe to show yet — a "not found" Q-Mark stays hidden either way.';
+    }
+    var summary = el('pack-summary');
+    if (summary) {
+      summary.textContent = recordedCount(p) === 0
+        ? 'Nothing recorded yet. Optional, and never guessed.'
+        : confirmedCount(p) + ' of 4 confirmed · ' + customerRows(p).length + ' shown to customers';
+    }
+  }
+
+  function formatDate(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  }
+
   function normalizeProduct(raw) {
     var p = raw && typeof raw === 'object' ? raw : {};
     var price = p.price_ugx;
@@ -768,6 +1064,7 @@
       status: p.status === 'published' ? 'published' : 'draft',
       owner_confirmed: p.owner_confirmed === true,
       claims_checked: p.claims_checked === true,
+      compliance: normalizeCompliance(p.compliance),
       created_at: typeof p.created_at === 'string' ? p.created_at : nowIso(),
       updated_at: typeof p.updated_at === 'string' ? p.updated_at : nowIso()
     };
@@ -984,11 +1281,13 @@
     el('p-description').value = p.description;
     el('p-confirmed').checked = p.owner_confirmed;
     el('p-claims').checked = p.claims_checked;
+    renderPackRecord(p);
     renderDerived();
   }
 
   function renderDerived() {
     var p = selected();
+    renderNotes();
     if (!p) return;
 
     var gate = validateProduct(p);
@@ -1317,6 +1616,7 @@
         status: p.status,
         owner_confirmed: p.owner_confirmed,
         claims_checked: p.claims_checked,
+        compliance: normalizeCompliance(p.compliance),
         created_at: p.created_at,
         updated_at: p.updated_at
       };
@@ -1429,6 +1729,11 @@
       var gate = validateProduct(p);
       lines.push('  ' + (index + 1) + '. ' + (p.name || '(unnamed)') + ' — ' + (p.category || 'no type') + ', ' + (p.size_label || 'no size') + ', ' + formatUGX(p.price_ugx));
       lines.push('     status=' + p.status + '  photo=' + (p.photo_state === 'ready' ? p.image_path : 'none') + '  confirmed=' + p.owner_confirmed + '  claimsChecked=' + p.claims_checked);
+      var pack = p.compliance || emptyCompliance();
+      var shownRows = customerRows(p);
+      lines.push('     pack record: ' + confirmedCount(p) + ' of 4 confirmed, shown to customers: ' + (shownRows.length ? shownRows.map(function (row) { return row.label; }).join(', ') : 'nothing'));
+      var openNotes = packNotes(p);
+      if (openNotes.length) lines.push('     pack record to do: ' + openNotes.map(function (note) { return note.title; }).join(' | '));
       if (gate.errors.length) lines.push('     BLOCKED: ' + gate.errors.join(' | '));
       if (gate.warnings.length) lines.push('     notes: ' + gate.warnings.join(' | '));
     });
@@ -1438,6 +1743,7 @@
     lines.push('  Products ready for the shop : ' + catalog.products.filter(function (p) { return p.status === 'published'; }).length);
     lines.push('  Products blocked by checks   : ' + catalog.products.filter(function (p) { return validateProduct(p).errors.length > 0; }).length);
     lines.push('  Products without a photo    : ' + missingPhotos.length);
+    lines.push('  Pack records complete       : ' + catalog.products.filter(function (p) { return packNotes(p).length === 0; }).length + ' of ' + catalog.products.length);
     if (state.notes.trim()) {
       lines.push('');
       lines.push('OWNER NOTES');
@@ -1707,6 +2013,30 @@
   el('p-description').addEventListener('input', function (e) { updateSelected({ description: e.target.value }); });
   el('p-confirmed').addEventListener('change', function (e) { updateSelected({ owner_confirmed: e.target.checked }); });
   el('p-claims').addEventListener('change', function (e) { updateSelected({ claims_checked: e.target.checked }); });
+
+  /* Pack record: typing a value clears its confirmation, because the thing the
+     owner confirmed is no longer what the box says. */
+  function setPackField(key, value) {
+    var p = selected();
+    if (!p) return;
+    var next = normalizeCompliance(packOf(p));
+    next[key] = { value: value, confirmed_on: null };
+    updateSelected({ compliance: next });
+    renderPackRecord(selected());
+  }
+  el('p-qmark').addEventListener('change', function (e) { setPackField('qmark_status', e.target.value); });
+  el('p-expiry').addEventListener('change', function (e) { setPackField('expiry', e.target.value); });
+  ['p-manufacturer', 'p-batch'].forEach(function (id) {
+    el(id).addEventListener('input', function (e) { setPackField(id === 'p-manufacturer' ? 'manufacturer' : 'batch_lot', e.target.value); });
+  });
+  el('p-show-pack').addEventListener('change', function (e) {
+    var p = selected();
+    if (!p) return;
+    var next = normalizeCompliance(packOf(p));
+    next.show_to_customers = e.target.checked && confirmedCount(p) > 0;
+    updateSelected({ compliance: next });
+    renderPackRecord(selected());
+  });
   el('p-status').addEventListener('change', function (e) { onStatusChange(e.target.value); });
 
   el('p-photo').addEventListener('change', function (e) {

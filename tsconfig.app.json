@@ -6,6 +6,8 @@
     "module": "esnext",
     "types": ["vite/client"],
     "allowArbitraryExtensions": true,
+    /* photo-variants.json is written by scripts/build-photo-variants.mjs and imported by the app */
+    "resolveJsonModule": true,
     "skipLibCheck": true,
 
     /* Bundler mode */

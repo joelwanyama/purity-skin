@@ -18,6 +18,9 @@ The shop's content is a single committed JSON file with an editor that runs in t
 | `src/catalog/storage.ts` | Load/merge browser drafts, export, filtering helpers. |
 | `src/catalog/useCatalog.ts` | React hook + context provider. |
 | `src/pages/Studio.tsx` | `/studio/catalogue` editor (noindex). |
+| `src/lib/compliance.ts` | Owner notes and customer-facing rows for the pack record. |
+| `src/order/ledger.ts` | The browser-local order ledger (`/studio/ledger`). |
+| `src/catalog/photo-variants.json` | Written by `npm run photos`; imported by the app. Committed. |
 
 ## The publish gate
 
@@ -33,6 +36,40 @@ A product can be `draft` or `published`. Only `published` products appear on the
 Warnings do not block publishing but are shown while editing: missing photo, missing summary, and claim language such as *cures*, *heals*, *treats*, *permanent*, *guaranteed*, *100%*, dermatologist approval, regulator references, and skin-lightening wording.
 
 The same gate runs on **import**. A hand-edited JSON file containing a `published` product that fails the gate is demoted to `draft` and the reason is reported, so the shop cannot be poisoned by a bad file.
+
+## The pack record (UNBS / PDPO)
+
+Each product may carry an optional `compliance` object. It is the owner's record of what was read off the physical pack, and it is the **only** route by which that information can reach a customer:
+
+```json
+"compliance": {
+  "qmark_status": { "value": "verified", "confirmed_on": "2026-10-20T00:00:00.000Z" },
+  "manufacturer": { "value": "Kampala Cosmetics Ltd", "confirmed_on": "2026-10-20T00:00:00.000Z" },
+  "batch_lot":    { "value": "B-2291", "confirmed_on": null },
+  "expiry":       { "value": "2027-04", "confirmed_on": "2026-10-20T00:00:00.000Z" },
+  "show_to_customers": true
+}
+```
+
+`qmark_status.value` is `verified`, `not_applicable`, `unverified` or empty. `expiry` is `YYYY-MM`. An empty value means **not recorded** — never "no" and never a default.
+
+Two separate acts are needed before a shopper sees anything:
+
+1. the field has a value **and** a `confirmed_on` date (the owner tapped "I checked this on the pack");
+2. `show_to_customers` is `true` for that product.
+
+`src/lib/compliance.ts` then applies four more rules, all unit-tested (`src/lib/compliance.test.ts`, 17 tests):
+
+| Rule | Why |
+| --- | --- |
+| `unverified` is never shown to a customer | The shop will not publish a negative statement about a supplier's certification; silence is safer than "not certified". |
+| An unconfirmed value is never shown | The owner confirmed something else, or nothing at all. |
+| A passed expiry is never shown | Advertising a dead batch is worse than saying nothing; the dashboard warns instead. |
+| A catalogue with no `compliance` key behaves exactly as before | Old files stay valid, and product pages do not change for products that have no record. |
+
+The **Important notes** panel in the builder and in `/studio/catalogue` lists every gap first — warnings (Q-Mark looked for and not found, expiry passed) before unconfirmed values, before plain blanks. That ordering is the feature: a gap you cannot see is a gap you will not fill.
+
+`npm run check:build` does not require a pack record; it is optional by design. `docs/PRODUCT-RESEARCH.md` §6 explains the PDPO reasoning.
 
 ## Editing workflow
 

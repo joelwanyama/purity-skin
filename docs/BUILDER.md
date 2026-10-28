@@ -12,9 +12,12 @@ It is also published at `/downloads/purity-skin-catalogue-builder.html` once the
 | Products | name, page link (slug, auto-generated and editable), product type, pack size, price in UGX, draft/published, one-line summary, description |
 | Photo | one image per product, centre-cropped to 4:5 and resized to ≤1600 px tall, converted to JPEG (quality 0.86) |
 | Publish checks | "name, size and price are real" + "wording and claims checked", with live error/warning lists that mirror `src/catalog/validation.ts` |
+| Pack record (owner only, optional) | UNBS Q-Mark as seen on the pack, manufacturer, batch/lot, expiry — each with an "I checked this on the pack" confirmation date, plus a switch for showing confirmed values to customers |
 | Finish | free-text notes for the handover |
 
 It also previews the product card exactly as the shop renders it, so what the owner approves is what customers see.
+
+The pack record is described in `docs/CATALOGUE.md` and in section 4 of `docs/OWNER-GUIDE.md`. Two rules hold in the builder exactly as they hold in the app: a value reaches a customer only when it is recorded **and** confirmed **and** customer display is switched on, and a "Q-Mark not found" answer is never shown to customers at all.
 
 ## What it exports
 
@@ -53,6 +56,14 @@ git push origin main && git push origin deploy
 
 Photos referenced in the JSON are root-relative (`/images/products/<slug>-01.jpg`), which is exactly where the ZIP puts them.
 
+## Important notes (added 2026-10-29)
+
+A panel directly under the header, above the product list, listing every gap in every product's pack record: warnings first (Q-Mark looked for and not found, expiry already passed), then values recorded but not confirmed, then blanks. Each product name in the panel is a button that selects that product and scrolls to its editor.
+
+The panel's chip reads `All records complete`, `N to fix` or `N products to fill in`, so the state is legible without opening anything.
+
+`INTEGRATION-NOTES.txt` in the ZIP repeats this: each product gets a `pack record: N of 4 confirmed, shown to customers: …` line and a `pack record to do: …` line, and the checklist gains `Pack records complete: N of M`.
+
 ## Interface (refined 2026-10-29)
 
 - **Three-step strip** at the top (Shop details → Products → Download) that fills in as you go and scrolls to each section.
@@ -71,6 +82,13 @@ Photos referenced in the JSON are root-relative (`/images/products/<slug>-01.jpg
 - **Autosave** keeps work in `localStorage`; if storage is blocked (some previews), the tool still works and says so.
 - **Leaving the page** prompts only when there are changes since the last download.
 - **Import is safe**: invalid JSON is rejected without touching existing work, and duplicate slugs are repaired.
+
+## Verification performed (2026-10-29, pack record)
+
+- Filled a product, selected `Seen on the pack`, and confirmed it: the line changed to `Confirmed from the pack on 28 Oct 2026` and the customer display switch became enabled. Recorded-but-unconfirmed (`B-2291`) stayed marked `hidden from customers`, and the summary read `2 of 4 confirmed · 0 shown to customers`.
+- Exported the ZIP and read `catalog.data.json`: `compliance` present with real `confirmed_on` timestamps on the confirmed fields, `null` on the unconfirmed batch, `""` on the untouched expiry — no invented values.
+- Reload persistence: `p-qmark` still `verified`, notes panel still listed the remaining gaps.
+- Both widths (390 × 844 and 1280 × 900): no console errors, no page errors.
 
 ## Verification performed (2026-10-28)
 

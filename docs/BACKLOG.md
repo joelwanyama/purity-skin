@@ -6,7 +6,19 @@ Status legend: **done** · **ready** (no blockers) · **needs owner** (blocked o
 
 ---
 
-## Shipped in this round
+## Shipped in the 29 October 2026 round (items 1–7 below)
+
+| # | Item | Evidence |
+| --- | --- | --- |
+| 1 | Per-product share pages with real previews | `scripts/lib/prerender.mjs` + 10 unit tests; `check-build` fails when a published product has no page; live smoke test requests each page from `/prerender.json`. See `docs/SHARE-PAGES.md` |
+| 2 | Photo pipeline: 480 px card, 1200 × 630 share crop, `srcset`/`sizes`, measured `width`/`height`, lazy | `scripts/build-photo-variants.mjs`, `src/catalog/photo-variants.json`, `ProductPhoto.tsx`; measured 296 kB → 41 kB per card. See `docs/PHOTO-PIPELINE.md` |
+| 3 | 1080 × 1080 Status price cards | `npm run export:cards` → `public/downloads/cards/<slug>.png`, only for published products with a confirmed price |
+| 4 | UNBS / PDPO pack record, owner-first | `src/lib/compliance.ts` + 17 unit tests, `ComplianceNotes`/`ComplianceEditor`, builder section + notes panel, `/policies#pack-record` |
+| 5 | Aggregate, cookieless counting — **off by default** | `src/lib/analytics.ts` + 4 tests; nothing is collected until `VITE_CF_BEACON_TOKEN` is set. See `docs/PRIVACY-ANALYTICS.md` |
+| 6 | Browser-local order ledger | `/studio/ledger`, `src/order/ledger.ts` + 17 tests: paste parsing, statuses, CSV, JSON backup, storage sanitising |
+| 7 | Owner guide, written for a phone | `docs/OWNER-GUIDE.md` → `npm run guide` → printable PDF + HTML copy in `public/downloads/` |
+
+## Shipped in the previous round
 
 | # | Item | Why it mattered | Evidence |
 | --- | --- | --- | --- |
